@@ -3,10 +3,7 @@ package de.kaes3kuch3n.raytracer;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.lang.reflect.Type;
 
 public class Main {
     private View view;
@@ -27,7 +24,7 @@ public class Main {
 
                 double planePosX = (stepSizeX * x) - 1;
                 double planePosY = (stepSizeY * y) - 1;
-                double distanceToHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, -1)).getRayHits(sphere);
+                double distanceToHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, -1)).getDistanceFromOrigin(sphere);
 
                 int red = 0xFFFF0000;
                 int black = 0xFF000000;

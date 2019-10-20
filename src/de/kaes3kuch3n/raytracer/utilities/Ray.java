@@ -3,15 +3,15 @@ package de.kaes3kuch3n.raytracer.utilities;
 import de.kaes3kuch3n.raytracer.Sphere;
 
 public class Ray {
-    private Vector3 position;
+    private Vector3 origin;
     private Vector3 direction;
 
-    public Ray(Vector3 position, Vector3 direction){
-        this.position = position;
+    public Ray(Vector3 origin, Vector3 direction) {
+        this.origin = origin;
         this.direction = direction;
     }
 
-    public double getRayHits(Sphere sphere){
+    public double getDistanceFromOrigin(Sphere sphere) {
         Vector3 spherePos = sphere.getPosition();
 
         double a = Math.pow(direction.x, 2) + Math.pow(direction.y, 2) + Math.pow(direction.z, 2);
