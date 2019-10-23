@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class View extends JFrame {
-    private Image image;
     public View() {
         setup();
     }
@@ -17,12 +16,22 @@ public class View extends JFrame {
     }
 
     public void setImage(Image image) {
-        this.image = image;
+        setContentPane(new ViewPanel(image));
+        pack();
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        g.drawImage(image, 0, 0, null);
+    private static class ViewPanel extends JPanel {
+        private Image image;
+
+        ViewPanel(Image image) {
+            this.image = image;
+            setPreferredSize(new Dimension(image.getWidth(this), image.getHeight(this)));
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.drawImage(image, 0, 0, null);
+        }
     }
 }

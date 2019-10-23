@@ -1,27 +1,28 @@
 package de.kaes3kuch3n.raytracer;
 
+import de.kaes3kuch3n.raytracer.display.ImagePanel;
+import de.kaes3kuch3n.raytracer.display.Window;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Main {
-    private View view;
-    private Camera camera;
     public static void main(String[] args) {
         Camera camera = new Camera(new Vector3(0d,0d,0d), new Vector3(0d,0d, -1.0));
         Sphere sphere = new Sphere(0, 0, -2, 0.5);
-        calculatePlane(new View(), camera, sphere);
+        Window window = new Window();
+        Image image = calculatePlane(window.getSize(), camera, sphere);
+        window.setImage(new ImagePanel(image));
     }
 
-    public static void calculatePlane(View view, Camera camera, Sphere sphere){
-        double stepSizeY = 2.0 / view.getHeight();
-        double stepSizeX = 2.0 / view.getWidth();
-        BufferedImage image = new BufferedImage(view.getWidth(), view.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        for (int y = 0; y < view.getHeight(); y++) {
-            for (int x = 0; x < view.getWidth(); x++) {
-                int pixelPos = x + y * view.getWidth();
-
+    public static Image calculatePlane(Dimension imageSize, Camera camera, Sphere sphere) {
+        double stepSizeY = 2.0 / imageSize.height;
+        double stepSizeX = 2.0 / imageSize.width;
+        BufferedImage image = new BufferedImage(imageSize.width, imageSize.height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < imageSize.height; y++) {
+            for (int x = 0; x < imageSize.width; x++) {
                 double planePosX = (stepSizeX * x) - 1;
                 double planePosY = (stepSizeY * y) - 1;
                 double distanceToHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, -1)).getDistanceFromOrigin(sphere);
@@ -35,7 +36,6 @@ public class Main {
                     image.setRGB(x, y, black);
             }
         }
-        view.setImage(image);
-        view.update(view.getGraphics());
+        return image;
     }
 }
