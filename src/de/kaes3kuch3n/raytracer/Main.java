@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         Camera camera = new Camera(new Vector3(0d,0d,0d), new Vector3(0d,0d, -1.0));
         Sphere sphere = new Sphere(0, 0, -2, 0.5);
-        Window window = new Window();
+        Window window = new Window(800, 800);
         Image image = calculatePlane(window.getSize(), camera, sphere);
         window.setImage(new ImagePanel(image));
     }

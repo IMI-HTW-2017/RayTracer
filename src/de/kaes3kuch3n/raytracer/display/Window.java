@@ -6,9 +6,9 @@ import java.awt.*;
 public class Window {
     private JFrame window;
 
-    public Window() {
+    public Window(int width, int height) {
         window = new JFrame("Ray Tracer");
-        window.setSize(800, 800);
+        window.setSize(width, height);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
