@@ -26,10 +26,11 @@ public class Main {
                 double planePosY = (stepSizeY * y) - 1;
                 double distanceToHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, -1)).getDistanceFromOrigin(sphere);
 
-                int red = 0xFFFF0000;
+                int color = 255 - (int)((distanceToHit - 1.5) * 512);
+                int newColor = 0xFF000000 | (color << 16) | (color << 8) | color;
                 int black = 0xFF000000;
                 if(distanceToHit > 0)
-                    image.setRGB(x, y, red);
+                    image.setRGB(x, y, newColor);
                 else
                     image.setRGB(x, y, black);
             }
