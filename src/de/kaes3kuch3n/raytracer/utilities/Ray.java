@@ -16,7 +16,7 @@ public class Ray {
         this.direction = direction;
     }
 
-    public double getDistanceFromOrigin(Sphere sphere) {
+    public Hit getDistanceFromOrigin(Sphere sphere) {
         Vector3 spherePos = sphere.getPosition();
         double a = Math.pow(direction.x, 2) + Math.pow(direction.y, 2) + Math.pow(direction.z, 2);
         double b = 2 * (origin.x * direction.x + origin.y * direction.y + origin.z * direction.z
@@ -27,15 +27,27 @@ public class Ray {
                 - sphere.getRadius() * sphere.getRadius();
 
         if(a == 0)
-            return -1;
+            return null;
 
         double radicand = b * b - 4 * a * c;
         if(radicand < 0)
-            return -1;
+            return null;
 
         double k = (-b - (b < 0 ? -1 : 1 ) * Math.sqrt(radicand)) / 2.0;
+        double distance = Math.min(c / k, k / a);
+        Vector3 position = new Vector3(origin.x + distance * direction.x, origin.y + distance * direction.y, origin.z + distance * direction.z);
 
-        return Math.min(c / k, k / a);
+        return new Hit(position, distance);
+    }
+
+    public static class Hit {
+        public Vector3 position;
+        public double distance;
+
+        public Hit(Vector3 position, double distance) {
+            this.position = position;
+            this.distance = distance;
+        }
     }
 }
 
