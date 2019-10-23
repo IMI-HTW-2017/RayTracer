@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         Camera camera = new Camera(new Vector3(0d,0d,0d), new Vector3(0d,0d, -1.0));
         Sphere sphere = new Sphere(0, 0, -2, 0.5);
-        Light light = new Light(new Vector3(2, 0, -2), new Color(255, 255, 255), 1f);
+        Light light = new Light(new Vector3(2, 0, -1), new Color(255, 255, 255), 1f);
         Window window = new Window(800, 800);
         Image image = calculatePlane(window.getSize(), camera, sphere, light);
         window.setImage(new ImagePanel(image));
@@ -39,12 +39,15 @@ public class Main {
                 double lightCos = Vector3.dot(lightDirection, normalVector);
                 if (lightCos < 0)
                     lightCos = 0;
-                int r = Math.min((int) (lightCos * light.getColor().getRed() * light.getIntensity()), 255);
-                int g = Math.min((int) (lightCos * light.getColor().getGreen() * light.getIntensity()), 255);
-                int b = Math.min((int) (lightCos * light.getColor().getBlue() * light.getIntensity()), 255);
 
-                int newColor = 0xFF000000 | (r << 16) | (g << 8) | b;
-                image.setRGB(x, y, newColor);
+                int globalLight = 5;
+                int r = Math.min((int) (lightCos * light.getColor().getRed() * light.getIntensity()) + globalLight, 255);
+                int g = Math.min((int) (lightCos * light.getColor().getGreen() * light.getIntensity()) + globalLight, 255);
+                int b = Math.min((int) (lightCos * light.getColor().getBlue() * light.getIntensity()) + globalLight, 255);
+
+                Color newColor = new Color(r, g, b);
+
+                image.setRGB(x, y, newColor.getRGB());
             }
         }
         return image;

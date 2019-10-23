@@ -26,9 +26,11 @@ public class Ray {
                 + spherePos.x * spherePos.x + spherePos.y * spherePos.y + spherePos.z * spherePos.z
                 - sphere.getRadius() * sphere.getRadius();
 
+        //Nothing hit
         if(a == 0)
             return null;
 
+        //Edge-case (tangent)
         double radicand = b * b - 4 * a * c;
         if(radicand < 0)
             return null;
