@@ -24,6 +24,10 @@ public class Vector3 {
         return new Vector3(first.x - second.x, first.y - second.y, first.z - second.z);
     }
 
+    public Vector3 multiply(double factor) {
+        return new Vector3(x * factor, y * factor, z * factor);
+    }
+
     public static double dot(Vector3 first, Vector3 second) {
         return first.x * second.x + first.y * second.y + first.z * second.z;
     }
@@ -33,6 +37,10 @@ public class Vector3 {
         double y = first.z * second.x - first.x * second.z;
         double z = first.x * second.y - first.y * second.x;
         return new Vector3(x, y, z);
+    }
+
+    public Vector3 inverted() {
+        return new Vector3(-x, -y, -z);
     }
 
     public static Vector3 normalize(Vector3 vector) {

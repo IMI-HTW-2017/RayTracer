@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-        Camera camera = new Camera(new Vector3(0d,0d,0d), new Vector3(0d,0d, -1.0));
+        Camera camera = new Camera(new Vector3(0d, 0d, 0d), new Vector3(0d, 0d, -1.0), 0);
         Sphere sphere = new Sphere(-2, 0, -2, 0.5);
         Sphere sphere2 = new Sphere(1, 0, -2, 0.5);
         Light light = new Light(new Vector3(0, 1, -1), new Color(255, 4, 0), 1f);

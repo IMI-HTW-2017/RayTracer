@@ -35,14 +35,34 @@ public class Scene {
         Graphics2D graphics2D = image.createGraphics();
         graphics2D.setPaint(Color.BLACK);
         graphics2D.fillRect(0, 0, image.getWidth(), image.getHeight());
+
+        // Get image plane and use it for calculating the ray directions
+        Camera.ImagePlane plane = camera.getImagePlane();
+        Vector3 topLeft = Vector3.subtract(plane.focusPoint, Vector3.add(plane.rightVector, plane.upVector.inverted()));
+
         double stepSizeX = 2.0 / imageSize.width;
         double stepSizeY = 2.0 / imageSize.height;
+
+        double planePosX = topLeft.x;
+        double planePosY = topLeft.y;
+        double planePosZ = topLeft.z;
+
         for (int y = 0; y < imageSize.height; y++) {
             for (int x = 0; x < imageSize.width; x++) {
-                double planePosX = (stepSizeX * x) - 1;
-                double planePosY = (stepSizeY * y) - 1;
+
+                Vector3 stepVectorX = plane.rightVector.multiply(stepSizeX * x);
+                Vector3 stepVectorY = plane.upVector.inverted().multiply(stepSizeY * y);
+
+                planePosX = topLeft.x + stepVectorX.x + stepVectorY.x;
+                planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
+                planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
+
+                if (x == 400 && y == 400) {
+                    System.out.println();
+                }
+
                 for (Sphere sphere : spheres) {
-                    Ray.Hit rayHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, -1)).getDistanceFromOrigin(sphere);
+                    Ray.Hit rayHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ)).getDistanceFromOrigin(sphere);
                     //Nothing hit? -> Black
                     if (rayHit == null) {
                         continue;
