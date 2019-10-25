@@ -1,6 +1,6 @@
 package de.kaes3kuch3n.raytracer.utilities;
 
-import de.kaes3kuch3n.raytracer.Sphere;
+import de.kaes3kuch3n.raytracer.objects.Sphere;
 
 public class Ray {
     private Vector3 origin;

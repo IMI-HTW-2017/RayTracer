@@ -1,4 +1,4 @@
-package de.kaes3kuch3n.raytracer;
+package de.kaes3kuch3n.raytracer.objects;
 
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
