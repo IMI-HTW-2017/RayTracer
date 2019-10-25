@@ -43,9 +43,7 @@ public class Scene {
         double stepSizeX = 2.0 / imageSize.width;
         double stepSizeY = 2.0 / imageSize.height;
 
-        double planePosX = topLeft.x;
-        double planePosY = topLeft.y;
-        double planePosZ = topLeft.z;
+        double planePosX, planePosY, planePosZ;
 
         for (int y = 0; y < imageSize.height; y++) {
             for (int x = 0; x < imageSize.width; x++) {
@@ -79,14 +77,14 @@ public class Scene {
                             lightCos = 0;
 
                         //Some global lighting
-                        int globalLight = 5;
-                        r += Math.min((int) (lightCos * light.getColor().getRed() * light.getIntensity()) + globalLight, 255);
-                        g += Math.min((int) (lightCos * light.getColor().getGreen() * light.getIntensity()) + globalLight, 255);
-                        b += Math.min((int) (lightCos * light.getColor().getBlue() * light.getIntensity()) + globalLight, 255);
+                        int globalLight = 0;
+                        r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x + globalLight;
+                        g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y + globalLight;
+                        b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z + globalLight;
+                        r = Math.min(r, 255);
+                        g = Math.min(g, 255);
+                        b = Math.min(b, 255);
                     }
-                    r /= lights.size();
-                    g /= lights.size();
-                    b /= lights.size();
                     int color = new Color(r, g, b).getRGB();
                     image.setRGB(x, y, color);
                 }
