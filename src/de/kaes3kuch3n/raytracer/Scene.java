@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Scene {
@@ -55,42 +56,81 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-                if (x == 400 && y == 400) {
-                    System.out.println();
-                }
-
+                ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
                 for (Sphere sphere : spheres) {
-                    Ray.Hit rayHit = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ)).getDistanceFromOrigin(sphere);
+                    Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
+                    Ray.Hit rayHit = sphere.getRayHit(ray);
+
                     //Nothing hit? -> Black
                     if (rayHit == null) {
                         continue;
                     }
-                    int r = 0;
-                    int g = 0;
-                    int b = 0;
-                    for (Light light : lights) {
-                        //Light with normal vector
-                        Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalize();
-                        Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalize();
-                        double lightCos = Vector3.dot(lightDirection, normalVector);
-                        if (lightCos < 0)
-                            lightCos = 0;
+                    rayHitResults.add(new RayHitResult(rayHit, sphere));
 
-                        //Some global lighting
-                        int globalLight = 0;
-                        r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x + globalLight;
-                        g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y + globalLight;
-                        b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z + globalLight;
-                        r = Math.min(r, 255);
-                        g = Math.min(g, 255);
-                        b = Math.min(b, 255);
-                    }
-                    int color = new Color(r, g, b).getRGB();
-                    image.setRGB(x, y, color);
                 }
+
+                if (rayHitResults.isEmpty())
+                    continue;
+
+                RayHitResult result = Collections.min(rayHitResults);
+                image.setRGB(x, y, calculateColor(result.sphere, result.rayHit));
             }
         }
         return image;
+    }
+
+    private int calculateColor(Sphere sphere, Ray.Hit rayHit) {
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        for (Light light : lights) {
+            boolean skipFlag = false;
+            //Light with normal vector
+            Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalize();
+            Ray rayToLight = new Ray(rayHit.position, lightDirection);
+            for (Sphere otherSphere : spheres) {
+                if (otherSphere == sphere)
+                    continue;
+                Ray.Hit otherRayHit = otherSphere.getRayHit(rayToLight);
+                if (otherRayHit != null) {
+                    skipFlag = true;
+                    break;
+                }
+            }
+            if (skipFlag)
+                continue;
+            Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalize();
+            double lightCos = Vector3.dot(lightDirection, normalVector);
+            if (lightCos < 0)
+                lightCos = 0;
+
+            //Some global lighting
+            int globalLight = 0;
+            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x + globalLight;
+            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y + globalLight;
+            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z + globalLight;
+            r = Math.min(r, 255);
+            g = Math.min(g, 255);
+            b = Math.min(b, 255);
+        }
+        return new Color(r, g, b).getRGB();
+    }
+
+    private static class RayHitResult implements Comparable {
+        private Ray.Hit rayHit;
+        private Sphere sphere;
+
+        public RayHitResult(Ray.Hit rayHit, Sphere sphere) {
+            this.rayHit = rayHit;
+            this.sphere = sphere;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if (!(o instanceof RayHitResult))
+                throw new ClassCastException();
+            return Double.compare(this.rayHit.distance, ((RayHitResult) o).rayHit.distance);
+        }
     }
 
 }

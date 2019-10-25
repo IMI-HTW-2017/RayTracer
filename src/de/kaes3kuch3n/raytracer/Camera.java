@@ -27,7 +27,7 @@ public class Camera {
         return new ImagePlane(focusPoint, right, up);
     }
 
-    public class ImagePlane {
+    public static class ImagePlane {
         public Vector3 focusPoint;
         public Vector3 rightVector;
         public Vector3 upVector;
