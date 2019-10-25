@@ -60,6 +60,8 @@ public class Sphere {
 
         double k = (-b - (b < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
         double distance = Math.min(c / k, k / a);
+        if (distance < 0)
+            return null;
         Vector3 position = new Vector3(rayOrigin.x + distance * rayDirection.x, rayOrigin.y + distance * rayDirection.y, rayOrigin.z + distance * rayDirection.z);
 
         return new Ray.Hit(position, distance);

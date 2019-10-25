@@ -22,7 +22,7 @@ public class Main {
         );
 
         scene.addLights(
-                new Light(new Vector3(0, 0, 0), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(0, 0, -0.5), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 1, -2), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, -1, -1), new Color(4, 0, 255), 5)
         );
