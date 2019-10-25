@@ -28,6 +28,13 @@ public class Vector3 {
         return first.x * second.x + first.y * second.y + first.z * second.z;
     }
 
+    public static Vector3 cross(Vector3 first, Vector3 second) {
+        double x = first.y * second.z - first.z * second.y;
+        double y = first.z * second.x - first.x * second.z;
+        double z = first.x * second.y - first.y * second.x;
+        return new Vector3(x, y, z);
+    }
+
     public static Vector3 normalize(Vector3 vector) {
         double magnitude = magnitude(vector);
         return new Vector3(vector.x / magnitude, vector.y / magnitude, vector.z / magnitude);
