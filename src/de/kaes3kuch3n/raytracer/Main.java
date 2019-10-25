@@ -13,14 +13,13 @@ public class Main {
         Camera camera = new Camera(new Vector3(0d,0d,0d), new Vector3(0d,0d, -1.0));
         Sphere sphere = new Sphere(-1, 0, -2, 0.5);
         Sphere sphere2 = new Sphere(1, 0, -2, 0.5);
-        Sphere sphere3 = new Sphere(0, 1, -2, 0.5);
-        Sphere sphere4 = new Sphere(0, -1, -2, 0.5);
-        Light light = new Light(new Vector3(0, 0, -1.5), new Color(255, 4, 0), 1f);
+        Light light = new Light(new Vector3(0, 1, -1), new Color(255, 4, 0), 1f);
+        Light light2 = new Light(new Vector3(0, -1, -1), new Color(4, 0, 255), 1f);
         Window window = new Window(800, 800);
 
         Scene scene = new Scene(camera, window.getSize());
-        scene.addSpheres(sphere, sphere2, sphere3, sphere4);
-        scene.addLights(light);
+        scene.addSpheres(sphere, sphere2);
+        scene.addLights(light, light2);
         Image image = scene.renderImage();
 
         window.setImage(new ImagePanel(image));

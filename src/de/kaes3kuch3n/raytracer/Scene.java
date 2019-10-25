@@ -22,28 +22,12 @@ public class Scene {
         this.imageSize = imageSize;
     }
 
-    public void addSphere(Sphere sphere) {
-        spheres.add(sphere);
-    }
-
     public void addSpheres(Sphere... spheres) {
         this.spheres.addAll(Arrays.asList(spheres));
     }
 
-    public void addLight(Light light) {
-        lights.add(light);
-    }
-
     public void addLights(Light... lights) {
         this.lights.addAll(Arrays.asList(lights));
-    }
-
-    public List<Sphere> getSpheres() {
-        return spheres;
-    }
-
-    public List<Light> getLights() {
-        return this.lights;
     }
 
     public Image renderImage() {
