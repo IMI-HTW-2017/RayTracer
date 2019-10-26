@@ -29,10 +29,6 @@ public class Sphere {
         return position;
     }
 
-    public double getRadius() {
-        return radius;
-    }
-
     public Vector3 getColorRatio() {
         return new Vector3(color.getRed() / 255d, color.getGreen() / 255d, color.getBlue() / 255d);
     }
@@ -49,7 +45,7 @@ public class Sphere {
                 + position.x * position.x + position.y * position.y + position.z * position.z
                 - radius * radius;
 
-        //Nothing hit
+        //What does this mean?
         if (a == 0)
             return null;
 
@@ -59,7 +55,9 @@ public class Sphere {
             return null;
 
         double k = (-b - (b < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
+        //Only first hit
         double distance = Math.min(c / k, k / a);
+        //Negative distance? Nothing hit
         if (distance < 0)
             return null;
         Vector3 position = new Vector3(rayOrigin.x + distance * rayDirection.x, rayOrigin.y + distance * rayDirection.y, rayOrigin.z + distance * rayDirection.z);

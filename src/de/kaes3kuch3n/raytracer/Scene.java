@@ -39,8 +39,8 @@ public class Scene {
 
         // Get image plane and use it for calculating the ray directions
         Camera.ImagePlane plane = camera.getImagePlane();
+        //Starting position is the top-left corner
         Vector3 topLeft = Vector3.subtract(plane.focusPoint, Vector3.add(plane.rightVector, plane.upVector.inverted()));
-
         double stepSizeX = 2.0 / imageSize.width;
         double stepSizeY = 2.0 / imageSize.height;
 
@@ -56,22 +56,22 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
+                //Used for determining in which order we need to draw (which sphere is in front of the other ones)
                 ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
+                //Calculate all rayhits with all spheres
                 for (Sphere sphere : spheres) {
                     Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
                     Ray.Hit rayHit = sphere.getRayHit(ray);
 
-                    //Nothing hit? -> Black
-                    if (rayHit == null) {
+                    //Current sphere not hit
+                    if (rayHit == null)
                         continue;
-                    }
                     rayHitResults.add(new RayHitResult(rayHit, sphere));
-
                 }
-
+                //No sphere hit
                 if (rayHitResults.isEmpty())
                     continue;
-
+                //Sorted by distance to camera -> Take the closed one
                 RayHitResult result = Collections.min(rayHitResults);
                 image.setRGB(x, y, calculateColor(result.sphere, result.rayHit));
             }
@@ -79,6 +79,13 @@ public class Scene {
         return image;
     }
 
+    /**
+     * Calculates the color of a pixel using the provided sphere and rayhit. Uses all lights in the scene.
+     *
+     * @param sphere The sphere that was hit
+     * @param rayHit The rayhit of the sphere and ray
+     * @return The color of the pixel (RGB int)
+     */
     private int calculateColor(Sphere sphere, Ray.Hit rayHit) {
         int r = 0;
         int g = 0;
@@ -88,10 +95,16 @@ public class Scene {
             //Light with normal vector
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalize();
             Ray rayToLight = new Ray(rayHit.position, lightDirection);
+
+            // ----- Shadows ----- //
+
+            //Check if there is a sphere between the current sphere and the light source
             for (Sphere otherSphere : spheres) {
+                //Skip if we are looking at the same sphere
                 if (otherSphere == sphere)
                     continue;
                 Ray.Hit otherRayHit = otherSphere.getRayHit(rayToLight);
+                //Something hit? Skip coloring
                 if (otherRayHit != null) {
                     skipFlag = true;
                     break;
@@ -99,16 +112,15 @@ public class Scene {
             }
             if (skipFlag)
                 continue;
+            // ---------- //
             Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalize();
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)
                 lightCos = 0;
 
-            //Some global lighting
-            int globalLight = 0;
-            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x + globalLight;
-            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y + globalLight;
-            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z + globalLight;
+            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x;
+            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y;
+            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z;
             r = Math.min(r, 255);
             g = Math.min(g, 255);
             b = Math.min(b, 255);
@@ -120,7 +132,7 @@ public class Scene {
         private Ray.Hit rayHit;
         private Sphere sphere;
 
-        public RayHitResult(Ray.Hit rayHit, Sphere sphere) {
+        private RayHitResult(Ray.Hit rayHit, Sphere sphere) {
             this.rayHit = rayHit;
             this.sphere = sphere;
         }
