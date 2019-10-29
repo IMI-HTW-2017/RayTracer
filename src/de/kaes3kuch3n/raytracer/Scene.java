@@ -103,7 +103,7 @@ public class Scene {
         for (Light light : lights) {
             boolean skipFlag = false;
             //Light with normal vector
-            Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalize();
+            Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
             Ray rayToLight = new Ray(rayHit.position, lightDirection);
 
             // ----- Shadows ----- //
@@ -123,7 +123,7 @@ public class Scene {
             if (skipFlag)
                 continue;
             // ---------- //
-            Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalize();
+            Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalized();
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)
                 lightCos = 0;

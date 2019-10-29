@@ -21,8 +21,8 @@ public class Camera {
         Vector3 direction = Vector3.subtract(focusPoint, position);
         Vector3 top = new Vector3(Math.sin(roll), Math.cos(roll), 0); // y-axis for roll = 0
 
-        Vector3 right = Vector3.cross(direction, top).normalize();
-        Vector3 up = Vector3.cross(right, direction).normalize();
+        Vector3 right = Vector3.cross(direction, top).normalized();
+        Vector3 up = Vector3.cross(right, direction).normalized();
 
         return new ImagePlane(focusPoint, right, up);
     }

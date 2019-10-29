@@ -6,6 +6,11 @@ import java.awt.*;
 public class ImagePanel extends JPanel {
     private Image image;
 
+    /**
+     * Create a new image panel
+     *
+     * @param image The image the panel is supposed to display
+     */
     public ImagePanel(Image image) {
         this.image = image;
         setPreferredSize(new Dimension(image.getWidth(this), image.getHeight(this)));
