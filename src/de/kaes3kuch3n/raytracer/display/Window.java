@@ -2,6 +2,9 @@ package de.kaes3kuch3n.raytracer.display;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.function.Consumer;
 
 public class Window {
     private JFrame window;
@@ -9,6 +12,7 @@ public class Window {
     public Window(int width, int height) {
         window = new JFrame("Ray Tracer");
         window.setSize(width, height);
+        window.getContentPane().setSize(width, height);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
@@ -20,6 +24,17 @@ public class Window {
     }
 
     public Dimension getSize() {
-        return window.getSize();
+        return window.getContentPane().getSize();
+    }
+
+    public void addResizeListener(Consumer<Dimension> resizeAction) {
+        window.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                JFrame frame = (JFrame) e.getComponent();
+                resizeAction.accept(frame.getContentPane().getSize());
+            }
+        });
     }
 }

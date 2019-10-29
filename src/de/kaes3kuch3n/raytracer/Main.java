@@ -9,10 +9,13 @@ import de.kaes3kuch3n.raytracer.utilities.Vector3;
 import java.awt.*;
 
 public class Main {
-    public static void main(String[] args) {
+    private Window window;
+    private Scene scene;
+
+    private void show() {
         Camera camera = new Camera(new Vector3(0d, 0d, 0d), new Vector3(0d, 0d, -1), 0);
-        Window window = new Window(1000, 1000);
-        Scene scene = new Scene(camera, window.getSize());
+        window = new Window(600, 400);
+        scene = new Scene(camera);
 
         scene.addSpheres(
                 new Sphere(-3, 3, -30, 22, new Color(255, 0, 0)),
@@ -27,7 +30,15 @@ public class Main {
                 //new Light(new Vector3(0, -1, -1), new Color(4, 0, 255), 5)
         );
 
-        Image image = scene.renderImage();
-        window.setImage(new ImagePanel(image));
+        window.addResizeListener(size -> window.setImage(getRenderedImage(size)));
+        window.setImage(getRenderedImage(window.getSize()));
+    }
+
+    private ImagePanel getRenderedImage(Dimension size) {
+        return new ImagePanel(scene.renderImage(size));
+    }
+
+    public static void main(String[] args) {
+        new Main().show();
     }
 }

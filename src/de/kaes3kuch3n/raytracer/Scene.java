@@ -16,11 +16,9 @@ public class Scene {
     private List<Sphere> spheres = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
     private Camera camera;
-    private Dimension imageSize;
 
-    public Scene(Camera camera, Dimension imageSize) {
+    public Scene(Camera camera) {
         this.camera = camera;
-        this.imageSize = imageSize;
     }
 
     public void addSpheres(Sphere... spheres) {
@@ -31,7 +29,7 @@ public class Scene {
         this.lights.addAll(Arrays.asList(lights));
     }
 
-    public Image renderImage() {
+    public Image renderImage(Dimension imageSize) {
         BufferedImage image = new BufferedImage(imageSize.width, imageSize.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = image.createGraphics();
         graphics2D.setPaint(Color.BLACK);
@@ -39,10 +37,22 @@ public class Scene {
 
         // Get image plane and use it for calculating the ray directions
         Camera.ImagePlane plane = camera.getImagePlane();
+
+        // Calculate aspect ratio
+        double widthRatio;
+        double heightRatio;
+        if (imageSize.width > imageSize.height) {
+            widthRatio = 1;
+            heightRatio = (double) imageSize.height / imageSize.width;
+        } else {
+            widthRatio = (double) imageSize.width / imageSize.height;
+            heightRatio = 1;
+        }
+
         //Starting position is the top-left corner
-        Vector3 topLeft = Vector3.subtract(plane.focusPoint, Vector3.add(plane.rightVector, plane.upVector.inverted()));
-        double stepSizeX = 2.0 / imageSize.width;
-        double stepSizeY = 2.0 / imageSize.height;
+        Vector3 topLeft = Vector3.subtract(plane.focusPoint, Vector3.add(plane.rightVector.multiply(widthRatio), plane.upVector.inverted().multiply(heightRatio)));
+        double stepSizeX = 2.0 * widthRatio / imageSize.width;
+        double stepSizeY = 2.0 * heightRatio / imageSize.height;
 
         double planePosX, planePosY, planePosZ;
 
