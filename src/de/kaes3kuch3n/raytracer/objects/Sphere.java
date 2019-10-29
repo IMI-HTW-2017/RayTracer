@@ -45,7 +45,6 @@ public class Sphere {
                 + position.x * position.x + position.y * position.y + position.z * position.z
                 - radius * radius;
 
-        //What does this mean?
         if (a == 0)
             return null;
 
@@ -60,8 +59,8 @@ public class Sphere {
         //Negative distance? Nothing hit
         if (distance < 0)
             return null;
-        Vector3 position = new Vector3(rayOrigin.x + distance * rayDirection.x, rayOrigin.y + distance * rayDirection.y, rayOrigin.z + distance * rayDirection.z);
 
+        Vector3 position = new Vector3(rayOrigin.x + distance * rayDirection.x, rayOrigin.y + distance * rayDirection.y, rayOrigin.z + distance * rayDirection.z);
         return new Ray.Hit(position, distance);
     }
 }

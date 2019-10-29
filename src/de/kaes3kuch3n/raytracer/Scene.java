@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings({"", "WeakerAccess"})
 public class Scene {
     private List<Sphere> spheres = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
@@ -66,7 +67,7 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-                //Used for determining in which order we need to draw (which sphere is in front of the other ones)
+                //Used for determining in which order we need to draw (which sphere-(part) is in front of the other ones)
                 ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
                 //Calculate all rayhits with all spheres
                 for (Sphere sphere : spheres) {
@@ -123,6 +124,7 @@ public class Scene {
             if (skipFlag)
                 continue;
             // ---------- //
+
             Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalized();
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)
@@ -138,6 +140,9 @@ public class Scene {
         return new Color(r, g, b).getRGB();
     }
 
+    /**
+     * Small class for saving rayhits and comparing them by their distance
+     */
     private static class RayHitResult implements Comparable {
         private Ray.Hit rayHit;
         private Sphere sphere;
