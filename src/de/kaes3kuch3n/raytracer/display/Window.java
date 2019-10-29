@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 
 public class Window {
     private JFrame window;
+    private Timer resizeTimer;
+    private Dimension previousSize;
 
     /**
      * Create a new window instance with a fixed inner width and height
@@ -22,6 +24,8 @@ public class Window {
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
+
+        previousSize = new Dimension(0, 0);
     }
 
     /**
@@ -51,8 +55,22 @@ public class Window {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                JFrame frame = (JFrame) e.getComponent();
-                resizeAction.accept(frame.getContentPane().getSize());
+                // Create a resize timer if it doesn't exist (delay prevents event from being spammed)
+                if (resizeTimer == null)
+                    resizeTimer = new Timer(100, actionEvent -> {
+                        JFrame frame = (JFrame) e.getComponent();
+                        // Check if size of window did actually change
+                        Dimension size = frame.getContentPane().getSize();
+                        if (size.width == previousSize.width && size.height == previousSize.height) {
+                            return;
+                        }
+                        // Size did change, execute resize action
+                        resizeAction.accept(size);
+                        previousSize = size;
+                    });
+                else {
+                    resizeTimer.restart();
+                }
             }
         });
     }
