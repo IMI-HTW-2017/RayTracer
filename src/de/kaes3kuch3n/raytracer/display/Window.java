@@ -13,7 +13,6 @@ public class Window {
 
     /**
      * Create a new window instance with a fixed inner width and height
-     *
      * @param width  The width of the window's content pane
      * @param height The height of the window's content pane
      */
