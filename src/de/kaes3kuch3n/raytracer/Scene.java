@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Scene {
@@ -67,23 +66,22 @@ public class Scene {
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
                 //Used for determining in which order we need to draw (which sphere-(part) is in front of the other ones)
-                ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
                 //Calculate all rayhits with all spheres
+                Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
+                RayHitResult minDistanceHit = null;
                 for (Sphere sphere : spheres) {
-                    Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
                     Ray.Hit rayHit = sphere.getRayHit(ray);
 
                     //Current sphere not hit
                     if (rayHit == null)
                         continue;
-                    rayHitResults.add(new RayHitResult(rayHit, sphere));
+                    if (minDistanceHit == null || minDistanceHit.compareTo(rayHit) > 0)
+                        minDistanceHit = new RayHitResult(rayHit, sphere);
                 }
                 //No sphere hit
-                if (rayHitResults.isEmpty())
+                if (minDistanceHit == null)
                     continue;
-                //Sorted by distance to camera -> Take the closed one
-                RayHitResult result = Collections.min(rayHitResults);
-                image.setRGB(x, y, calculateColor(result.sphere, result.rayHit));
+                image.setRGB(x, y, calculateColor(minDistanceHit.sphere, minDistanceHit.rayHit));
             }
         }
         return image;
