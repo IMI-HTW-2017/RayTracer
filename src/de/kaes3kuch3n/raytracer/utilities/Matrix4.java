@@ -17,6 +17,10 @@ public class Matrix4 {
         };
     }
 
+    public Matrix4(float[] matrixValues) {
+        mat4 = matrixValues;
+    }
+
     public Matrix4(Matrix4 copy) {
         mat4 = copy.mat4.clone();
     }
