@@ -13,7 +13,7 @@ public class Main {
 
     private void show() {
         Camera camera = new Camera(new Vector3(0d, 0d, 0d), new Vector3(0d, 0d, -1), 0);
-        Window window = new Window(600, 400);
+        Window window = new Window(1200, 1000);
         scene = new Scene(camera);
 
         scene.addSpheres(
@@ -28,7 +28,7 @@ public class Main {
         );
 
         ImagePanel imagePanel = getRenderedImage(window.getSize());
-        imagePanel.addResizeListener(size -> imagePanel.updateImage(scene.renderImage(size)));
+        window.addResizeListener(size -> imagePanel.updateImage(scene.renderImage(size)));
         window.setImage(imagePanel);
     }
 

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings({"", "WeakerAccess"})
 public class Scene {
     private List<Sphere> spheres = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
