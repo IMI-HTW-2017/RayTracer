@@ -28,7 +28,8 @@ public class Ray {
      * @return The ray's direction vector
      */
     public Vector3 getDirection() {
-        return direction;
+        //return direction;
+        return Vector3.subtract(direction, origin);
     }
 
     public static class Hit {

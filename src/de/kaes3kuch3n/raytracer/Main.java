@@ -12,7 +12,7 @@ public class Main {
     private Scene scene;
 
     private void show() {
-        Camera camera = new Camera(new Vector3(0d, 0d, 0d), new Vector3(0d, 0d, -1), 0);
+        Camera camera = new Camera(new Vector3(0d, 0d, 1d), new Vector3(0d, 0d, 0d), 0);
         Window window = new Window(600, 400);
         scene = new Scene(camera);
 
@@ -24,7 +24,7 @@ public class Main {
 
         scene.addLights(
                 new Light(new Vector3(2, 0, -1.2), new Color(255, 255, 255), 1f),
-                new Light(new Vector3(0, 0, 0), new Color(255, 255, 255), 0.05f)
+                new Light(new Vector3(0, 0, 0), new Color(255, 255, 255), 0.1f)
         );
 
         ImagePanel imagePanel = getRenderedImage(window.getSize());
