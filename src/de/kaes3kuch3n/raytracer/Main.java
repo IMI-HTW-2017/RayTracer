@@ -13,18 +13,18 @@ public class Main {
 
     private void show() {
         Camera camera = new Camera(new Vector3(0d, 0d, 1d), new Vector3(0d, 0d, 0d), 0);
-        Window window = new Window(600, 400);
+        Window window = new Window(800, 800);
         scene = new Scene(camera);
 
         scene.addSpheres(
-                new Sphere(-3, 3, -30, 22, new Color(255, 0, 0)),
-                new Sphere(0, 0, -2, 0.5, new Color(0, 255, 39)),
-                new Sphere(0.6, 0.1, -1.6, 0.05, new Color(0, 180, 255))
+                new Sphere(0, 0, 0, 0.5f, new Color(255, 0, 0))
+                //new Sphere(0, 0, -2, 0.5, new Color(0, 255, 39)),
+                //new Sphere(0.6, 0.1, -1.6, 0.05, new Color(0, 180, 255))
         );
 
         scene.addLights(
-                new Light(new Vector3(2, 0, -1.2), new Color(255, 255, 255), 1f),
-                new Light(new Vector3(0, 0, 0), new Color(255, 255, 255), 0.1f)
+                new Light(new Vector3(0, 0, 1), new Color(255, 255, 255), 1f)
+                //new Light(new Vector3(0, 0, 0), new Color(255, 255, 255), 0.1f)
         );
 
         ImagePanel imagePanel = getRenderedImage(window.getSize());

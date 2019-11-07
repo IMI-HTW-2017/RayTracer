@@ -71,7 +71,7 @@ public class Scene {
                 ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
                 //Calculate all rayhits with all spheres
                 for (Sphere sphere : spheres) {
-                    Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
+                    Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                     Ray.Hit rayHit = sphere.getRayHit(ray);
 
                     //Current sphere not hit
