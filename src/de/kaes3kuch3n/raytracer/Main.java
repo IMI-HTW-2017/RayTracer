@@ -24,13 +24,13 @@ public class Main {
         );
 
          */
-        Quadric quadric = new Quadric(1, 1, 1, 0, 0, 0, 0, 0, 0, -1f, new Color(255, 58, 63));
+        Quadric quadric = new Quadric(1, 1, 1, 0, 0, 0, 0, 0, 0, -1.1f, new Color(255, 58, 63));
         //quadric.move(0,0,-10);
         scene.addQuadrics(quadric);
 
         scene.addLights(
-                new Light(new Vector3(6, 0, 0), new Color(255, 255, 255), 1f),
-                new Light(new Vector3(0, 0, 3), new Color(255, 255, 255), 1f)
+                //new Light(new Vector3(6, 0, 0), new Color(255, 255, 255), 1f),
+                new Light(new Vector3(0, 0, 10), new Color(255, 255, 255), 1f)
         );
 
         ImagePanel imagePanel = getRenderedImage(window.getSize());

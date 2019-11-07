@@ -55,7 +55,7 @@ public class Quadric {
                 + 2 * d * p.x * p.y + 2 * e * p.x * p.z + 2 * f * p.y * p.z
                 + 2 * g * p.x + 2 * h * p.y + 2 * i * p.z + j;
 
-
+/*
         if (aa == 0)
             return null;
 
@@ -73,24 +73,30 @@ public class Quadric {
         if (distance < 0)
             return null;
 
+ */
 
-/*
+
+
         double x1 = -bb / 2 + Math.sqrt((bb * bb) / 4 - cc);
         double x2 = -bb / 2 - Math.sqrt((bb * bb) / 4 - cc);
+        //if(!Double.isNaN(x1) || !Double.isNaN(x2))
+        //System.out.println("!!!");
         double distance = Math.min(x1, x2);
         if (distance < 0 || Double.isNaN(distance))
             return null;
 
- */
+
 
         Vector3 position = new Vector3(p.x + distance * v.x, p.y + distance * v.y, p.z + distance * v.z);
         return new Ray.Hit(position, distance);
     }
 
     public Vector3 getNormalVector(Vector3 point) {
-        return new Vector3(a * point.x + d * point.y + e * point.z + g,
+        return new Vector3(
+                a * point.x + d * point.y + e * point.z + g,
                 b * point.y + d * point.x + f * point.z + h,
-                c * point.z + e * point.x + f * point.y + i).normalized();
+                c * point.z + e * point.x + f * point.y + i
+        ).normalized();
     }
 
     public Vector3 getColorRatio() {

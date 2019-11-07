@@ -61,6 +61,9 @@ public class Scene {
                 Vector3 stepVectorX = plane.rightVector.multiply(stepSizeX * x);
                 Vector3 stepVectorY = plane.upVector.inverted().multiply(stepSizeY * y);
 
+                //if(x == imageSize.width / 2 && y == imageSize.height / 2)
+                //System.out.println();
+
                 planePosX = topLeft.x + stepVectorX.x + stepVectorY.x;
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
@@ -81,8 +84,8 @@ public class Scene {
                 //No sphere hit
                 if (minDistanceHit == null)
                     continue;
-                image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                //image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
+                //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
+                image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
             }
         }
         return image;
