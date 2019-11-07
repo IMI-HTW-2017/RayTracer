@@ -67,7 +67,7 @@ public class Scene {
 
                 //Used for determining in which order we need to draw (which sphere-(part) is in front of the other ones)
                 //Calculate all rayhits with all spheres
-                Ray ray = new Ray(camera.getPosition(), new Vector3(planePosX, planePosY, planePosZ));
+                Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
                 for (Quadric quadric : quadrics) {
                     Ray.Hit rayHit = quadric.getRayhit(ray);
@@ -82,7 +82,7 @@ public class Scene {
                 if (minDistanceHit == null)
                     continue;
                 image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                //calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit)
+                //image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
             }
         }
         return image;
@@ -105,6 +105,7 @@ public class Scene {
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
             Ray rayToLight = new Ray(rayHit.position, lightDirection);
 
+            /*
             // ----- Shadows ----- //
 
             //Check if there is a quadric between the current quadric and the light source
@@ -122,7 +123,7 @@ public class Scene {
             if (skipFlag)
                 continue;
             // ---------- //
-
+             */
             Vector3 normalVector = quadric.getNormalVector(rayHit.position);
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)

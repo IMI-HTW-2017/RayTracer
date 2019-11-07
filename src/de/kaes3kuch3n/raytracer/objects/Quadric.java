@@ -48,14 +48,14 @@ public class Quadric {
         Vector3 p = ray.getOrigin();
 
         double aa = a + b + c + 2 * d * v.x * v.y + 2 * e * v.x * v.z + 2 * f * v.y * v.z;
-        double bb = 2 * (a * p.x * v.x + b * p.y * v.y * c * p.z * v.z
+        double bb = 2 * (a * p.x * v.x + b * p.y * v.y + c * p.z * v.z
                 + d * p.x * v.y + d * p.y * v.x + e * p.x * v.z + e * p.z * v.x + f * p.y * v.z + f * p.z * v.y
                 + g * v.x + h * v.y + i * v.z);
         double cc = a * p.x * p.x + b * p.y * p.y + c * p.z * p.z + v.x * v.x + v.y * v.y + v.z * v.z
                 + 2 * d * p.x * p.y + 2 * e * p.x * p.z + 2 * f * p.y * p.z
                 + 2 * g * p.x + 2 * h * p.y + 2 * i * p.z + j;
 
-        /*
+
         if (aa == 0)
             return null;
 
@@ -72,14 +72,16 @@ public class Quadric {
         //Negative distance? Nothing hit
         if (distance < 0)
             return null;
-*/
 
 
+/*
         double x1 = -bb / 2 + Math.sqrt((bb * bb) / 4 - cc);
         double x2 = -bb / 2 - Math.sqrt((bb * bb) / 4 - cc);
         double distance = Math.min(x1, x2);
         if (distance < 0 || Double.isNaN(distance))
             return null;
+
+ */
 
         Vector3 position = new Vector3(p.x + distance * v.x, p.y + distance * v.y, p.z + distance * v.z);
         return new Ray.Hit(position, distance);
