@@ -37,7 +37,6 @@ public class CSG extends Quadric {
                     return hitsWithFirstCSG[0];
                 else
                     return Ray.Hit.Min(hitsWithFirstCSG[0], hitsWithSecondCSG[0]);
-                break;
             case INTERSECTION:
                 if (hitsWithFirstCSG == null || hitsWithSecondCSG == null)
                     return null;
@@ -52,7 +51,6 @@ public class CSG extends Quadric {
                     return hitsWithSecondCSG[0];
                 else
                     return hitsWithFirstCSG[0];
-                break;
             case DIFFERENCE:
                 if (hitsWithFirstCSG == null)
                     return null;
@@ -66,9 +64,9 @@ public class CSG extends Quadric {
                     return null;
                 else if (firstEnter < secondEnter)
                     return hitsWithFirstCSG[0];
-                else if (secondExit < firstExit)
+                else
                     return hitsWithSecondCSG[1];
-                break;
         }
+        return null;
     }
 }
