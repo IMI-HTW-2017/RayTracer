@@ -1,43 +1,50 @@
 package de.kaes3kuch3n.raytracer.objects;
 
-import de.kaes3kuch3n.raytracer.utilities.Matrix4;
+import de.kaes3kuch3n.raytracer.utilities.MatrixHelper;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
+import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import java.awt.*;
 
 public class Quadric {
 
-    private Matrix4 q;
-    private float a, b, c, d, e, f, g, h, i, j;
+    private RealMatrix q;
+    private double a, b, c, d, e, f, g, h, i, j;
     private Color color;
 
-    public Quadric(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, Color color) {
-        q = new Matrix4(new float[]{
-                a, d, e, g,
-                d, b, f, h,
-                e, f, c, i,
-                g, h, i, j
-        });
+    public Quadric(RealMatrix q, Color color) {
+        this.q = q;
         this.color = color;
         updateValues();
     }
 
-    private void updateValues() {
-        float[] values = q.getValuesAsArray();
-        a = values[0];
-        b = values[5];
-        c = values[10];
-        d = values[1];
-        e = values[2];
-        f = values[6];
-        g = values[3];
-        h = values[7];
-        i = values[11];
-        j = values[15];
+    public Quadric translate(double x, double y, double z) {
+        return transform(MatrixHelper.createTranslation(x, y, z));
     }
 
-    public Ray.Hit getRayhit(Ray ray) {
+    public Quadric scale(double factor) {
+        return transform(MatrixHelper.createScaling(factor, factor, factor));
+    }
+
+    public Quadric scale(double x, double y, double z) {
+        return transform(MatrixHelper.createScaling(x, y, z));
+    }
+
+    public Quadric rotateX(double angle) {
+        return transform(MatrixHelper.createRotationX(angle));
+    }
+
+    public Quadric rotateY(double angle) {
+        return transform(MatrixHelper.createRotationY(angle));
+    }
+
+    public Quadric rotateZ(double angle) {
+        return transform(MatrixHelper.createRotationZ(angle));
+    }
+
+    public Ray.Hit getRayHit(Ray ray) {
         Vector3 v = ray.getDirection();
         Vector3 p = ray.getOrigin();
 
@@ -78,5 +85,25 @@ public class Quadric {
 
     public Vector3 getColorRatio() {
         return new Vector3(color.getRed() / 255d, color.getGreen() / 255d, color.getBlue() / 255d);
+    }
+
+    private Quadric transform(RealMatrix transformationMatrix) {
+        RealMatrix inverse = new LUDecomposition(transformationMatrix).getSolver().getInverse();
+        q = inverse.transpose().multiply(q.multiply(inverse));
+        updateValues();
+        return this;
+    }
+
+    private void updateValues() {
+        a = q.getEntry(0, 0);
+        b = q.getEntry(1, 1);
+        c = q.getEntry(2, 2);
+        d = q.getEntry(1, 0);
+        e = q.getEntry(2, 0);
+        f = q.getEntry(2, 1);
+        g = q.getEntry(3, 0);
+        h = q.getEntry(3, 1);
+        i = q.getEntry(3, 2);
+        j = q.getEntry(3, 3);
     }
 }

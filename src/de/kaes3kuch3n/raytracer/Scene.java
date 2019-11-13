@@ -69,12 +69,13 @@ public class Scene {
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
                 for (Quadric quadric : quadrics) {
-                    Ray.Hit rayHit = quadric.getRayhit(ray);
+                    Ray.Hit rayHit = quadric.getRayHit(ray);
 
                     //Current quadric not hit
                     if (rayHit == null)
                         continue;
-                    if (minDistanceHit == null || minDistanceHit.compareTo(rayHit) > 0)
+
+                    if (minDistanceHit == null || minDistanceHit.compareTo(new RayHitResult(rayHit, quadric)) > 0)
                         minDistanceHit = new RayHitResult(rayHit, quadric);
                 }
                 //No sphere hit

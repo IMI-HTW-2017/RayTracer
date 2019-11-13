@@ -16,7 +16,11 @@ public class Main {
         Window window = new Window(800, 800);
         scene = new Scene(camera);
 
-        scene.addQuadrics(new Sphere(1, new Color(255, 0, 0)));
+        scene.addQuadrics(
+                new Sphere(1, new Color(255, 0, 0)).scale(1.2, 0.5, 1).translate(0, -1.5, 0),
+                new Sphere(0.8, new Color(0, 255, 0)).translate(0, 1.2, 0).rotateZ(65),
+                new Sphere(0.8, new Color(0, 255, 0)).translate(0, 1.2, 0).rotateZ(-65)
+        );
 
         scene.addLights(
                 new Light(new Vector3(0, 0, 3), new Color(255, 255, 255), 1f)
