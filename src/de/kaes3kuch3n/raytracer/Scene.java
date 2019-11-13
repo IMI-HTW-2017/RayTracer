@@ -80,8 +80,8 @@ public class Scene {
                 //No sphere hit
                 if (minDistanceHit == null)
                     continue;
-                image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                //image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
+                //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
+                image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
             }
         }
         return image;

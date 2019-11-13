@@ -12,19 +12,11 @@ public class Main {
     private Scene scene;
 
     private void show() {
-        Camera camera = new Camera(new Vector3(0d, 0d, 4d), new Vector3(0d, 0d, 2d), 0);
-        Window window = new Window(1000, 1000);
+        Camera camera = new Camera(new Vector3(0d, 0d, 4d), new Vector3(0d, 0d, 3d), 0);
+        Window window = new Window(800, 800);
         scene = new Scene(camera);
 
-        /*
-        scene.addSpheres(
-                new Sphere(-3, 3, -30, 22, new Color(255, 0, 0)),
-                new Sphere(0, 0, -2, 0.5, new Color(0, 255, 39)),
-                new Sphere(0.6, 0.1, -1.6, 0.05, new Color(0, 180, 255))
-        );
-
-         */
-        Quadric quadric = new Quadric(1, 1, 1, 0, 0, 0, 0, 0, 0, -1.001f, new Color(255, 58, 63));
+        Quadric quadric = new Quadric(0, 1, 1, 0, 0, 0, 0, 0, 0, -1, new Color(255, 0, 0));
         //quadric.move(0,0,2);
         scene.addQuadrics(quadric);
 
