@@ -37,7 +37,14 @@ public class Quadric {
         j = values[15];
     }
 
-    public Ray.Hit getRayhit(Ray ray) {
+    public Ray.Hit getFirstRayhit(Ray ray) {
+        Ray.Hit[] hits = getRayhits(ray);
+        if (hits == null)
+            return null;
+        return getRayhits(ray)[0];
+    }
+
+    protected Ray.Hit[] getRayhits(Ray ray) {
         Vector3 v = ray.getDirection();
         Vector3 p = ray.getOrigin();
 
@@ -58,15 +65,23 @@ public class Quadric {
 
 
         double k = (-bb - (bb < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
-        // Only first hit
-        double distance = Math.min(cc / k, k / aa);
-        // Negative distance? Nothing hit
-        if (distance < 0)
+        Double firstDistance = cc / k;
+        Double secondDistance = k / aa;
+        //TODO Is that correct?
+        if (firstDistance < 0 || secondDistance < 0)
             return null;
 
-        Vector3 position = new Vector3(p.x + distance * v.x, p.y + distance * v.y, p.z + distance * v.z);
-        return new Ray.Hit(position, distance);
+        if (firstDistance > secondDistance) {
+            Double temp = firstDistance;
+            firstDistance = secondDistance;
+            secondDistance = temp;
+        }
+
+        Vector3 firstHitPos = new Vector3(p.x + firstDistance * v.x, p.y + firstDistance * v.y, p.z + firstDistance * v.z);
+        Vector3 secondHitPos = new Vector3(p.x + secondDistance * v.x, p.y + secondDistance * v.y, p.z + secondDistance * v.z);
+        return new Ray.Hit[]{new Ray.Hit(firstHitPos, firstDistance), new Ray.Hit(secondHitPos, secondDistance)};
     }
+
 
     public Vector3 getNormalVector(Vector3 point) {
         return new Vector3(

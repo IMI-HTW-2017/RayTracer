@@ -1,5 +1,7 @@
 package de.kaes3kuch3n.raytracer.utilities;
 
+import java.util.Objects;
+
 public class Ray {
     private Vector3 origin;
     private Vector3 direction;
@@ -17,6 +19,7 @@ public class Ray {
 
     /**
      * Get the ray's origin
+     *
      * @return The ray's origin vector
      */
     public Vector3 getOrigin() {
@@ -25,6 +28,7 @@ public class Ray {
 
     /**
      * Get the ray's direction
+     *
      * @return The ray's direction vector
      */
     public Vector3 getDirection() {
@@ -38,6 +42,14 @@ public class Ray {
         public Hit(Vector3 position, double distance) {
             this.position = position;
             this.distance = distance;
+        }
+
+        public static Hit Min(Ray.Hit first, Ray.Hit second) {
+            if (first != null && second != null)
+                return (first.distance < second.distance) ? first : second;
+            else if (first == null && second == null)
+                return null;
+            else return Objects.requireNonNullElse(first, second);
         }
     }
 }

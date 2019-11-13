@@ -69,7 +69,7 @@ public class Scene {
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
                 for (Quadric quadric : quadrics) {
-                    Ray.Hit rayHit = quadric.getRayhit(ray);
+                    Ray.Hit rayHit = quadric.getFirstRayhit(ray);
 
                     //Current quadric not hit
                     if (rayHit == null)
