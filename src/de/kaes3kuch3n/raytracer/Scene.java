@@ -61,15 +61,11 @@ public class Scene {
                 Vector3 stepVectorX = plane.rightVector.multiply(stepSizeX * x);
                 Vector3 stepVectorY = plane.upVector.inverted().multiply(stepSizeY * y);
 
-                //if(x == imageSize.width / 2 && y == imageSize.height / 2)
-                //System.out.println();
-
                 planePosX = topLeft.x + stepVectorX.x + stepVectorY.x;
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-                //Used for determining in which order we need to draw (which sphere-(part) is in front of the other ones)
-                //Calculate all rayhits with all spheres
+
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
                 for (Quadric quadric : quadrics) {
@@ -84,8 +80,8 @@ public class Scene {
                 //No sphere hit
                 if (minDistanceHit == null)
                     continue;
-                //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
+                image.setRGB(x, y, new Color(255, 0, 0).getRGB());
+                //image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
             }
         }
         return image;

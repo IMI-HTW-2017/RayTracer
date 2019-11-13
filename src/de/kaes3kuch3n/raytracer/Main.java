@@ -12,7 +12,7 @@ public class Main {
     private Scene scene;
 
     private void show() {
-        Camera camera = new Camera(new Vector3(0d, 0d, 4d), new Vector3(0d, 0d, 3d), 0);
+        Camera camera = new Camera(new Vector3(0d, 0d, 4d), new Vector3(0d, 0d, 2d), 0);
         Window window = new Window(1000, 1000);
         scene = new Scene(camera);
 
@@ -24,13 +24,14 @@ public class Main {
         );
 
          */
-        Quadric quadric = new Quadric(1, 1, 1, 0, 0, 0, 0, 0, 0, -1.1f, new Color(255, 58, 63));
-        //quadric.move(0,0,-10);
+        Quadric quadric = new Quadric(1, 1, 1, 0, 0, 0, 0, 0, 0, -1.001f, new Color(255, 58, 63));
+        //quadric.move(0,0,2);
         scene.addQuadrics(quadric);
 
         scene.addLights(
-                //new Light(new Vector3(6, 0, 0), new Color(255, 255, 255), 1f),
-                new Light(new Vector3(0, 0, 10), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(0, 0, 3), new Color(255, 255, 255), 1f)
+                //new Light(new Vector3(3, 0, 3), new Color(255, 255, 255), 1f)
+                //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );
 
         ImagePanel imagePanel = getRenderedImage(window.getSize());

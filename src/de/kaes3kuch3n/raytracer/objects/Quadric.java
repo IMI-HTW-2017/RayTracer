@@ -55,7 +55,7 @@ public class Quadric {
                 + 2 * d * p.x * p.y + 2 * e * p.x * p.z + 2 * f * p.y * p.z
                 + 2 * g * p.x + 2 * h * p.y + 2 * i * p.z + j;
 
-/*
+
         if (aa == 0)
             return null;
 
@@ -73,9 +73,9 @@ public class Quadric {
         if (distance < 0)
             return null;
 
- */
 
 
+/*
 
         double x1 = -bb / 2 + Math.sqrt((bb * bb) / 4 - cc);
         double x2 = -bb / 2 - Math.sqrt((bb * bb) / 4 - cc);
@@ -84,6 +84,8 @@ public class Quadric {
         double distance = Math.min(x1, x2);
         if (distance < 0 || Double.isNaN(distance))
             return null;
+
+ */
 
 
 
