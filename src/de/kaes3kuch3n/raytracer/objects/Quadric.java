@@ -23,11 +23,6 @@ public class Quadric {
         updateValues();
     }
 
-    public void move(float x, float y, float z) {
-        q.translate(x, y, z);
-        updateValues();
-    }
-
     private void updateValues() {
         float[] values = q.getValuesAsArray();
         a = values[0];
