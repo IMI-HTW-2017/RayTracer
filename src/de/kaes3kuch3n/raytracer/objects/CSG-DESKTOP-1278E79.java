@@ -20,10 +20,6 @@ public class CSG extends Quadric {
 
     @Override
     public Ray.Hit getFirstRayhit(Ray ray) {
-
-    }
-
-    private Ray.Hit[] getRayhitsRecursive() {
         Ray.Hit[] hitsWithFirstCSG = super.getRayhits(ray);
         //No second CSG, no need to get the "lower" CSG
         if (second == null)
