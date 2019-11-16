@@ -1,5 +1,6 @@
 package de.kaes3kuch3n.raytracer;
 
+import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
 import de.kaes3kuch3n.raytracer.objects.Quadric;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Scene {
-    private List<Quadric> quadrics = new ArrayList<>();
+    private List<CSG> csg = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
     private Camera camera;
 
@@ -20,8 +21,8 @@ public class Scene {
         this.camera = camera;
     }
 
-    public void addQuadrics(Quadric... quadrics) {
-        this.quadrics.addAll(Arrays.asList(quadrics));
+    public void addCSGs(CSG... csgs) {
+        this.csg.addAll(Arrays.asList(csgs));
     }
 
     public void addLights(Light... lights) {
@@ -68,20 +69,20 @@ public class Scene {
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
-                for (Quadric quadric : quadrics) {
-                    Ray.Hit rayHit = quadric.getFirstRayhit(ray);
+                for (CSG csg : csg) {
+                    Ray.Hit rayHit = csg.getFirstRayHit(ray);
 
                     //Current quadric not hit
                     if (rayHit == null)
                         continue;
                     if (minDistanceHit == null || minDistanceHit.compareTo(rayHit) > 0)
-                        minDistanceHit = new RayHitResult(rayHit, quadric);
+                        minDistanceHit = new RayHitResult(rayHit, csg);
                 }
                 //No sphere hit
                 if (minDistanceHit == null)
                     continue;
                 //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
+                image.setRGB(x, y, calculateColor(minDistanceHit.csg, minDistanceHit.rayHit));
             }
         }
         return image;
@@ -143,11 +144,11 @@ public class Scene {
      */
     private static class RayHitResult implements Comparable {
         private Ray.Hit rayHit;
-        private Quadric quadric;
+        private CSG csg;
 
-        private RayHitResult(Ray.Hit rayHit, Quadric quadric) {
+        private RayHitResult(Ray.Hit rayHit, CSG csg) {
             this.rayHit = rayHit;
-            this.quadric = quadric;
+            this.csg = csg;
         }
 
         @Override

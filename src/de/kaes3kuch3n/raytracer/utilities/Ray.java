@@ -1,6 +1,6 @@
 package de.kaes3kuch3n.raytracer.utilities;
 
-import java.util.Objects;
+import de.kaes3kuch3n.raytracer.objects.Quadric;
 
 public class Ray {
     private Vector3 origin;
@@ -38,18 +38,12 @@ public class Ray {
     public static class Hit {
         public Vector3 position;
         public double distance;
+        public Quadric quadric;
 
-        public Hit(Vector3 position, double distance) {
+        public Hit(Vector3 position, double distance, Quadric quadric) {
             this.position = position;
             this.distance = distance;
-        }
-
-        public static Hit Min(Ray.Hit first, Ray.Hit second) {
-            if (first != null && second != null)
-                return (first.distance < second.distance) ? first : second;
-            else if (first == null && second == null)
-                return null;
-            else return Objects.requireNonNullElse(first, second);
+            this.quadric = quadric;
         }
     }
 }

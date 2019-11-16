@@ -5,6 +5,8 @@ import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
 import java.awt.*;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Quadric {
 
@@ -37,14 +39,12 @@ public class Quadric {
         j = values[15];
     }
 
-    public Ray.Hit getFirstRayhit(Ray ray) {
-        Ray.Hit[] hits = getRayhits(ray);
-        if (hits == null)
-            return null;
-        return getRayhits(ray)[0];
+    public Ray.Hit getFirstRayHit(Ray ray) {
+        SortedMap hits = getRayHits(ray);
+        return (Ray.Hit) hits.get(hits.firstKey());
     }
 
-    protected Ray.Hit[] getRayhits(Ray ray) {
+    protected SortedMap getRayHits(Ray ray) {
         Vector3 v = ray.getDirection();
         Vector3 p = ray.getOrigin();
 
@@ -67,7 +67,7 @@ public class Quadric {
         double k = (-bb - (bb < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
         Double firstDistance = cc / k;
         Double secondDistance = k / aa;
-        //TODO Is that correct?
+        //Quadric in camera
         if (firstDistance < 0 || secondDistance < 0)
             return null;
 
@@ -76,10 +76,10 @@ public class Quadric {
             firstDistance = secondDistance;
             secondDistance = temp;
         }
-
-        Vector3 firstHitPos = new Vector3(p.x + firstDistance * v.x, p.y + firstDistance * v.y, p.z + firstDistance * v.z);
-        Vector3 secondHitPos = new Vector3(p.x + secondDistance * v.x, p.y + secondDistance * v.y, p.z + secondDistance * v.z);
-        return new Ray.Hit[]{new Ray.Hit(firstHitPos, firstDistance), new Ray.Hit(secondHitPos, secondDistance)};
+        SortedMap<Double, Ray.Hit> hits = new TreeMap<>();
+        hits.put(firstDistance, new Ray.Hit(new Vector3(p.x + firstDistance * v.x, p.y + firstDistance * v.y, p.z + firstDistance * v.z), firstDistance, this));
+        hits.put(secondDistance, new Ray.Hit(new Vector3(p.x + secondDistance * v.x, p.y + secondDistance * v.y, p.z + secondDistance * v.z), secondDistance, this));
+        return hits;
     }
 
 

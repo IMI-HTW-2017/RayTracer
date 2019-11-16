@@ -4,6 +4,7 @@ import de.kaes3kuch3n.raytracer.utilities.Operator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 
 import java.awt.*;
+import java.util.SortedMap;
 
 public class CSG extends Quadric {
     private CSG second;
@@ -13,22 +14,45 @@ public class CSG extends Quadric {
         super(a, b, c, d, e, f, g, h, i, j, color);
     }
 
+
     public void addCSG(CSG second, Operator operator) {
         this.second = second;
         this.operator = operator;
     }
 
     @Override
-    public Ray.Hit getFirstRayhit(Ray ray) {
-
+    public Ray.Hit getFirstRayHit(Ray ray) {
+        SortedMap hits = getRayhitsRecursive(ray);
+        return (Ray.Hit) hits.get(hits.firstKey());
     }
 
-    private Ray.Hit[] getRayhitsRecursive() {
-        Ray.Hit[] hitsWithFirstCSG = super.getRayhits(ray);
+    private SortedMap getRayhitsRecursive(Ray ray) {
+        SortedMap rayHits = super.getRayHits(ray);
         //No second CSG, no need to get the "lower" CSG
         if (second == null)
-            return hitsWithFirstCSG[0];
-        Ray.Hit[] hitsWithSecondCSG = second.getRayhits(ray);
+            return rayHits;
+
+        SortedMap secondHits = second.getRayhitsRecursive(ray);
+        //Second missed?
+        if (secondHits == null)
+            return rayHits;
+        switch (operator) {
+            case COMBINE:
+                rayHits.putAll(secondHits);
+                break;
+            case INTERSECTION:
+                rayHits = rayHits.subMap(secondHits.firstKey(), secondHits.lastKey());
+                break;
+            case DIFFERENCE:
+                rayHits.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
+                break;
+        }
+        return rayHits;
+    }
+
+    /*
+
+
         //Nothing hit, no need to calculate a new CSG
         if (hitsWithFirstCSG == null && hitsWithSecondCSG == null)
             return null;
@@ -72,5 +96,5 @@ public class CSG extends Quadric {
                     return hitsWithSecondCSG[1];
         }
         return null;
-    }
+     */
 }
