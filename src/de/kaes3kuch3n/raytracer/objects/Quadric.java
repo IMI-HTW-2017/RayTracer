@@ -1,50 +1,50 @@
 package de.kaes3kuch3n.raytracer.objects;
 
-import de.kaes3kuch3n.raytracer.utilities.Matrix4;
+import de.kaes3kuch3n.raytracer.utilities.MatrixHelper;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
+import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import java.awt.*;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class Quadric {
 
-    private Matrix4 q;
-    private float a, b, c, d, e, f, g, h, i, j;
+    private RealMatrix q;
+    private double a, b, c, d, e, f, g, h, i, j;
     private Color color;
 
-    public Quadric(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, Color color) {
-        q = new Matrix4(new float[]{
-                a, d, e, g,
-                d, b, f, h,
-                e, f, c, i,
-                g, h, i, j
-        });
+    public Quadric(RealMatrix q, Color color) {
+        this.q = q;
         this.color = color;
         updateValues();
     }
 
-    private void updateValues() {
-        float[] values = q.getValuesAsArray();
-        a = values[0];
-        b = values[5];
-        c = values[10];
-        d = values[1];
-        e = values[2];
-        f = values[6];
-        g = values[3];
-        h = values[7];
-        i = values[11];
-        j = values[15];
+    public Quadric translate(double x, double y, double z) {
+        return transform(MatrixHelper.createTranslation(x, y, z));
     }
 
-    public Ray.Hit getFirstRayHit(Ray ray) {
-        SortedMap hits = getRayHits(ray);
-        return (Ray.Hit) hits.get(hits.firstKey());
+    public Quadric scale(double factor) {
+        return transform(MatrixHelper.createScaling(factor, factor, factor));
     }
 
-    protected SortedMap getRayHits(Ray ray) {
+    public Quadric scale(double x, double y, double z) {
+        return transform(MatrixHelper.createScaling(x, y, z));
+    }
+
+    public Quadric rotateX(double angle) {
+        return transform(MatrixHelper.createRotationX(angle));
+    }
+
+    public Quadric rotateY(double angle) {
+        return transform(MatrixHelper.createRotationY(angle));
+    }
+
+    public Quadric rotateZ(double angle) {
+        return transform(MatrixHelper.createRotationZ(angle));
+    }
+
+    public Ray.Hit getRayHit(Ray ray) {
         Vector3 v = ray.getDirection();
         Vector3 p = ray.getOrigin();
 
@@ -65,23 +65,15 @@ public class Quadric {
 
 
         double k = (-bb - (bb < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
-        Double firstDistance = cc / k;
-        Double secondDistance = k / aa;
-        //Quadric in camera
-        if (firstDistance < 0 || secondDistance < 0)
+        // Only first hit
+        double distance = Math.min(cc / k, k / aa);
+        // Negative distance? Nothing hit
+        if (distance < 0)
             return null;
 
-        if (firstDistance > secondDistance) {
-            Double temp = firstDistance;
-            firstDistance = secondDistance;
-            secondDistance = temp;
-        }
-        SortedMap<Double, Ray.Hit> hits = new TreeMap<>();
-        hits.put(firstDistance, new Ray.Hit(new Vector3(p.x + firstDistance * v.x, p.y + firstDistance * v.y, p.z + firstDistance * v.z), firstDistance, this));
-        hits.put(secondDistance, new Ray.Hit(new Vector3(p.x + secondDistance * v.x, p.y + secondDistance * v.y, p.z + secondDistance * v.z), secondDistance, this));
-        return hits;
+        Vector3 position = new Vector3(p.x + distance * v.x, p.y + distance * v.y, p.z + distance * v.z);
+        return new Ray.Hit(position, distance);
     }
-
 
     public Vector3 getNormalVector(Vector3 point) {
         return new Vector3(
@@ -93,5 +85,25 @@ public class Quadric {
 
     public Vector3 getColorRatio() {
         return new Vector3(color.getRed() / 255d, color.getGreen() / 255d, color.getBlue() / 255d);
+    }
+
+    private Quadric transform(RealMatrix transformationMatrix) {
+        RealMatrix inverse = new LUDecomposition(transformationMatrix).getSolver().getInverse();
+        q = inverse.transpose().multiply(q.multiply(inverse));
+        updateValues();
+        return this;
+    }
+
+    private void updateValues() {
+        a = q.getEntry(0, 0);
+        b = q.getEntry(1, 1);
+        c = q.getEntry(2, 2);
+        d = q.getEntry(1, 0);
+        e = q.getEntry(2, 0);
+        f = q.getEntry(2, 1);
+        g = q.getEntry(3, 0);
+        h = q.getEntry(3, 1);
+        i = q.getEntry(3, 2);
+        j = q.getEntry(3, 3);
     }
 }

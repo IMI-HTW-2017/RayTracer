@@ -140,7 +140,7 @@ public class Scene {
     }
 
     /**
-     * Small class for saving rayhits and comparing them by their distance
+     * Small class for saving ray hits and comparing them by their distance
      */
     private static class RayHitResult implements Comparable {
         private Ray.Hit rayHit;
