@@ -2,6 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
+
 public class Camera {
     private Vector3 position;
     private Vector3 focusPoint;

@@ -1,7 +1,7 @@
 package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.objects.Sphere;
+import de.kaes3kuch3n.raytracer.objects.Quadric;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
@@ -9,12 +9,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings({"", "WeakerAccess"})
 public class Scene {
-    private List<Sphere> spheres = new ArrayList<>();
+    private List<Quadric> quadrics = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
     private Camera camera;
 
@@ -22,8 +20,8 @@ public class Scene {
         this.camera = camera;
     }
 
-    public void addSpheres(Sphere... spheres) {
-        this.spheres.addAll(Arrays.asList(spheres));
+    public void addQuadrics(Quadric... quadrics) {
+        this.quadrics.addAll(Arrays.asList(quadrics));
     }
 
     public void addLights(Light... lights) {
@@ -67,37 +65,37 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-                //Used for determining in which order we need to draw (which sphere-(part) is in front of the other ones)
-                ArrayList<RayHitResult> rayHitResults = new ArrayList<>();
-                //Calculate all rayhits with all spheres
-                for (Sphere sphere : spheres) {
-                    Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
-                    Ray.Hit rayHit = sphere.getRayHit(ray);
 
-                    //Current sphere not hit
+                Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
+                RayHitResult minDistanceHit = null;
+                for (Quadric quadric : quadrics) {
+                    Ray.Hit rayHit = quadric.getRayHit(ray);
+
+                    //Current quadric not hit
                     if (rayHit == null)
                         continue;
-                    rayHitResults.add(new RayHitResult(rayHit, sphere));
+
+                    if (minDistanceHit == null || minDistanceHit.compareTo(new RayHitResult(rayHit, quadric)) > 0)
+                        minDistanceHit = new RayHitResult(rayHit, quadric);
                 }
                 //No sphere hit
-                if (rayHitResults.isEmpty())
+                if (minDistanceHit == null)
                     continue;
-                //Sorted by distance to camera -> Take the closed one
-                RayHitResult result = Collections.min(rayHitResults);
-                image.setRGB(x, y, calculateColor(result.sphere, result.rayHit));
+                //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
+                image.setRGB(x, y, calculateColor(minDistanceHit.quadric, minDistanceHit.rayHit));
             }
         }
         return image;
     }
 
     /**
-     * Calculates the color of a pixel using the provided sphere and rayhit. Uses all lights in the scene.
+     * Calculates the color of a pixel using the provided quadric and rayhit. Uses all lights in the scene.
      *
-     * @param sphere The sphere that was hit
-     * @param rayHit The rayhit of the sphere and ray
+     * @param quadric The quadric that was hit
+     * @param rayHit The rayhit of the quadric and ray
      * @return The color of the pixel (RGB int)
      */
-    private int calculateColor(Sphere sphere, Ray.Hit rayHit) {
+    private int calculateColor(Quadric quadric, Ray.Hit rayHit) {
         int r = 0;
         int g = 0;
         int b = 0;
@@ -107,14 +105,15 @@ public class Scene {
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
             Ray rayToLight = new Ray(rayHit.position, lightDirection);
 
+            /*
             // ----- Shadows ----- //
 
-            //Check if there is a sphere between the current sphere and the light source
-            for (Sphere otherSphere : spheres) {
-                //Skip if we are looking at the same sphere
-                if (otherSphere == sphere)
+            //Check if there is a quadric between the current quadric and the light source
+            for (Quadric otherQuadric : quadrics) {
+                //Skip if we are looking at the same quadric
+                if (otherQuadric == quadric)
                     continue;
-                Ray.Hit otherRayHit = otherSphere.getRayHit(rayToLight);
+                Ray.Hit otherRayHit = otherQuadric.getRayhit(rayToLight);
                 //Something hit? Skip coloring
                 if (otherRayHit != null) {
                     skipFlag = true;
@@ -124,15 +123,15 @@ public class Scene {
             if (skipFlag)
                 continue;
             // ---------- //
-
-            Vector3 normalVector = Vector3.subtract(rayHit.position, sphere.getPosition()).normalized();
+             */
+            Vector3 normalVector = quadric.getNormalVector(rayHit.position);
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)
                 lightCos = 0;
 
-            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * sphere.getColorRatio().x;
-            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * sphere.getColorRatio().y;
-            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * sphere.getColorRatio().z;
+            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * quadric.getColorRatio().x;
+            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * quadric.getColorRatio().y;
+            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * quadric.getColorRatio().z;
             r = Math.min(r, 255);
             g = Math.min(g, 255);
             b = Math.min(b, 255);
@@ -145,11 +144,11 @@ public class Scene {
      */
     private static class RayHitResult implements Comparable {
         private Ray.Hit rayHit;
-        private Sphere sphere;
+        private Quadric quadric;
 
-        private RayHitResult(Ray.Hit rayHit, Sphere sphere) {
+        private RayHitResult(Ray.Hit rayHit, Quadric quadric) {
             this.rayHit = rayHit;
-            this.sphere = sphere;
+            this.quadric = quadric;
         }
 
         @Override
