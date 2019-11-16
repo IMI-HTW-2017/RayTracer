@@ -2,6 +2,7 @@ package de.kaes3kuch3n.raytracer.objects;
 
 import de.kaes3kuch3n.raytracer.utilities.Operator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import java.awt.*;
 import java.util.SortedMap;
@@ -10,24 +11,28 @@ public class CSG extends Quadric {
     private CSG second;
     private Operator operator;
 
-    public CSG(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, Color color) {
-        super(a, b, c, d, e, f, g, h, i, j, color);
-    }
 
+    public CSG(RealMatrix q, Color color) {
+        super(q, color);
+    }
 
     public void addCSG(CSG second, Operator operator) {
         this.second = second;
         this.operator = operator;
     }
 
-    @Override
     public Ray.Hit getFirstRayHit(Ray ray) {
         SortedMap hits = getRayhitsRecursive(ray);
+        if(hits == null)
+            return null;
         return (Ray.Hit) hits.get(hits.firstKey());
     }
 
     private SortedMap getRayhitsRecursive(Ray ray) {
-        SortedMap rayHits = super.getRayHits(ray);
+        SortedMap rayHits = super.getRayHit(ray);
+        //Nothing hit
+        if(rayHits == null)
+            return null;
         //No second CSG, no need to get the "lower" CSG
         if (second == null)
             return rayHits;
@@ -36,6 +41,7 @@ public class CSG extends Quadric {
         //Second missed?
         if (secondHits == null)
             return rayHits;
+
         switch (operator) {
             case COMBINE:
                 rayHits.putAll(secondHits);

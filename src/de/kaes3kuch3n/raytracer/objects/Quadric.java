@@ -7,6 +7,8 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
 import java.awt.*;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Quadric {
 
@@ -44,7 +46,7 @@ public class Quadric {
         return transform(MatrixHelper.createRotationZ(angle));
     }
 
-    public Ray.Hit getRayHit(Ray ray) {
+    public SortedMap getRayHit(Ray ray) {
         Vector3 v = ray.getDirection();
         Vector3 p = ray.getOrigin();
 
@@ -65,14 +67,17 @@ public class Quadric {
 
 
         double k = (-bb - (bb < 0 ? -1 : 1) * Math.sqrt(radicand)) / 2.0;
-        // Only first hit
-        double distance = Math.min(cc / k, k / aa);
+
+        double distance1 = cc / k;
+        double distance2 = k / aa;
         // Negative distance? Nothing hit
-        if (distance < 0)
+        if (distance1 < 0 || distance2 < 0)
             return null;
 
-        Vector3 position = new Vector3(p.x + distance * v.x, p.y + distance * v.y, p.z + distance * v.z);
-        return new Ray.Hit(position, distance);
+        TreeMap<Double, Ray.Hit> hits = new TreeMap<>();
+        hits.put(distance1, new Ray.Hit(new Vector3(p.x + distance1 * v.x, p.y + distance1 * v.y, p.z + distance1 * v.z), distance1, this));
+        hits.put(distance2, new Ray.Hit(new Vector3(p.x + distance2 * v.x, p.y + distance2 * v.y, p.z + distance2 * v.z), distance2, this));
+        return hits;
     }
 
     public Vector3 getNormalVector(Vector3 point) {
