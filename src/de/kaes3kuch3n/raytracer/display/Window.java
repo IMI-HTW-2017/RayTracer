@@ -1,6 +1,7 @@
 package de.kaes3kuch3n.raytracer.display;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -10,6 +11,7 @@ public class Window {
     private JFrame window;
     private Timer resizeTimer;
     private Dimension previousSize;
+    private final JSlider slider;
 
     /**
      * Create a new window instance with a fixed inner width and height
@@ -24,7 +26,14 @@ public class Window {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
 
+        slider = new JSlider(0, 359, 0);
+        window.getContentPane().add(slider, BorderLayout.SOUTH);
+
         previousSize = new Dimension(0, 0);
+    }
+
+    public void addSliderListener(ChangeListener listener) {
+        slider.addChangeListener(listener);
     }
 
     /**
@@ -32,7 +41,8 @@ public class Window {
      * @param imagePanel The image panel containing the image to show
      */
     public void setImage(ImagePanel imagePanel) {
-        window.setContentPane(imagePanel);
+        window.getContentPane().add(imagePanel, BorderLayout.CENTER);
+        //window.setContentPane(imagePanel);
         window.pack();
     }
 

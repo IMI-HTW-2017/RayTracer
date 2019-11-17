@@ -2,7 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.objects.Quadric;
+import de.kaes3kuch3n.raytracer.utilities.Operator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
@@ -18,6 +18,10 @@ public class Scene {
     private Camera camera;
 
     public Scene(Camera camera) {
+        this.camera = camera;
+    }
+
+    public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
@@ -91,11 +95,11 @@ public class Scene {
     /**
      * Calculates the color of a pixel using the provided quadric and rayhit. Uses all lights in the scene.
      *
-     * @param quadric The quadric that was hit
+     * @param csg The csg that was hit
      * @param rayHit The rayhit of the quadric and ray
      * @return The color of the pixel (RGB int)
      */
-    private int calculateColor(Quadric quadric, Ray.Hit rayHit) {
+    private int calculateColor(CSG csg, Ray.Hit rayHit) {
         int r = 0;
         int g = 0;
         int b = 0;
@@ -124,14 +128,19 @@ public class Scene {
                 continue;
             // ---------- //
              */
-            Vector3 normalVector = quadric.getNormalVector(rayHit.position);
+            Vector3 normalVector;
+            if(!rayHit.invertedNormal)
+                 normalVector = rayHit.quadric.getNormalVector(rayHit.position);
+            else
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position).inverted();
+
             double lightCos = Vector3.dot(lightDirection, normalVector);
             if (lightCos < 0)
                 lightCos = 0;
 
-            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * quadric.getColorRatio().x;
-            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * quadric.getColorRatio().y;
-            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * quadric.getColorRatio().z;
+            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * rayHit.quadric.getColorRatio().x;
+            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * rayHit.quadric.getColorRatio().y;
+            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * rayHit.quadric.getColorRatio().z;
             r = Math.min(r, 255);
             g = Math.min(g, 255);
             b = Math.min(b, 255);

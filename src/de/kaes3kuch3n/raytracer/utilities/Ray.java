@@ -39,11 +39,17 @@ public class Ray {
         public Vector3 position;
         public double distance;
         public Quadric quadric;
+        public boolean invertedNormal;
 
         public Hit(Vector3 position, double distance, Quadric quadric) {
             this.position = position;
             this.distance = distance;
             this.quadric = quadric;
+        }
+
+        public Hit invertNormal() {
+            invertedNormal = true;
+            return this;
         }
     }
 }

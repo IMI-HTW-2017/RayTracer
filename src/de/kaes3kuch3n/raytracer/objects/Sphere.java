@@ -4,7 +4,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
 import java.awt.*;
 
-public class Sphere extends Quadric {
+public class Sphere extends CSG {
 
     public Sphere(double radius, Color color) {
         super(new Array2DRowRealMatrix(new double[][]{
