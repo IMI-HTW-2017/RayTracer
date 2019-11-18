@@ -11,7 +11,7 @@ public class Window {
     private JFrame window;
     private Timer resizeTimer;
     private Dimension previousSize;
-    private final JSlider slider;
+    private JPanel sliderPanel;
 
     /**
      * Create a new window instance with a fixed inner width and height
@@ -19,21 +19,18 @@ public class Window {
      * @param height The height of the window's content pane
      */
     public Window(int width, int height) {
+        sliderPanel = new JPanel();
+        sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.PAGE_AXIS));
+
         window = new JFrame("Ray Tracer");
         window.setSize(width, height);
         window.getContentPane().setSize(width, height);
+        window.add(sliderPanel, BorderLayout.SOUTH);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
 
-        slider = new JSlider(0, 359, 0);
-        window.getContentPane().add(slider, BorderLayout.SOUTH);
-
         previousSize = new Dimension(0, 0);
-    }
-
-    public void addSliderListener(ChangeListener listener) {
-        slider.addChangeListener(listener);
     }
 
     /**
@@ -42,7 +39,19 @@ public class Window {
      */
     public void setImage(ImagePanel imagePanel) {
         window.getContentPane().add(imagePanel, BorderLayout.CENTER);
-        //window.setContentPane(imagePanel);
+        window.pack();
+    }
+
+    public void addSlider(String name, int min, int max, int value, ChangeListener changeListener) {
+        JLabel label = new JLabel(name);
+        JSlider slider = new JSlider(min, max, value);
+        slider.addChangeListener(changeListener);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+        panel.add(label);
+        panel.add(slider);
+        sliderPanel.add(panel);
         window.pack();
     }
 
