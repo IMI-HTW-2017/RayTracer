@@ -22,6 +22,9 @@ public class Quadric {
         updateValues();
     }
 
+    public Quadric() {
+    }
+
     public Quadric translate(double x, double y, double z) {
         return transform(MatrixHelper.createTranslation(x, y, z));
     }

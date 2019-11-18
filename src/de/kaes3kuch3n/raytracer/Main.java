@@ -22,17 +22,26 @@ public class Main {
         Camera camera = new Camera(new Vector3(0d, 0d, 4d), new Vector3(0d, 0d, 3d), 0);
         scene = new Scene(camera);
 
-        CSG sphere = new Sphere(1, new Color(255, 0, 0));
-        CSG sphere2 = new Sphere(1, new Color(19, 255, 0));
+        Sphere sphere1 = new Sphere(1, new Color(255, 0, 0));
+        Sphere sphere2 = new Sphere(1, new Color(19, 255, 0));
 
-        sphere.translate(-0.6, 0, 0);
+        Sphere sphere3 = new Sphere(1, new Color(0, 4, 255));
+        Sphere sphere4 = new Sphere(1, new Color(250, 0, 255));
+
+        sphere1.translate(-0.6, 0, 0);
         sphere2.translate(0.6, 0, 0);
-        sphere1Mat = sphere.q;
+        sphere1Mat = sphere1.q;
         sphere2Mat = sphere2.q;
 
-        sphere.intersect(sphere2);
+        sphere3.translate(-0.6, 0.6, 0.2);
+        sphere4.translate(0.6, 0.6, 0.2);
 
-        scene.addCSGs(sphere);
+        CSG test = new CSG(sphere1, sphere2, Operator.COMBINE);
+        CSG test2 = new CSG(sphere3, sphere4, Operator.COMBINE);
+        CSG test3 = new CSG(test, test2, Operator.INTERSECT);
+
+
+        scene.addCSGs(test3);
 
         scene.addLights(
                 new Light(new Vector3(2, 0, 3), new Color(255, 255, 255), 1f)
@@ -50,9 +59,9 @@ public class Main {
             Object evtSrc = e.getSource();
             if (evtSrc instanceof JSlider) {
                 double angle = ((JSlider) evtSrc).getValue();
-                sphere.q = sphere1Mat;
+                sphere1.q = sphere1Mat;
                 sphere2.q = sphere2Mat;
-                sphere.rotateY(angle);
+                sphere1.rotateY(angle);
                 sphere2.rotateY(angle);
                 imagePanel.updateImage(scene.renderImage(window.getSize()));
             }
