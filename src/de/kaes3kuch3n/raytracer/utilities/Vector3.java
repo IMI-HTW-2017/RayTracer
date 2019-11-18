@@ -53,6 +53,16 @@ public class Vector3 {
     }
 
     /**
+     * Divides a vector using the given divisor
+     *
+     * @param divisor The divisor to divide the vector with
+     * @return The product vector of the vector and the factor
+     */
+    public Vector3 divide(double divisor) {
+        return new Vector3(x / divisor, y / divisor, z / divisor);
+    }
+
+    /**
      * Calculates the dot product of two vectors
      * @param first The first vector
      * @param second The second vector

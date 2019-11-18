@@ -4,8 +4,10 @@ import de.kaes3kuch3n.raytracer.display.ImagePanel;
 import de.kaes3kuch3n.raytracer.display.Window;
 import de.kaes3kuch3n.raytracer.objects.Light;
 import de.kaes3kuch3n.raytracer.objects.Sphere;
+import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class Main {
@@ -16,10 +18,13 @@ public class Main {
         Window window = new Window(800, 800);
         scene = new Scene(camera);
 
+        Material red = new Material(new Color(255, 0, 0), 0.1, 0.2);
+        Material green = new Material(new Color(184, 115, 51), 0, 1);
+
         scene.addQuadrics(
-                new Sphere(1, new Color(255, 0, 0)).scale(1.2, 0.5, 1).translate(0, -1.5, 0),
-                new Sphere(0.8, new Color(0, 255, 0)).translate(0, 1.2, 0).rotateZ(65),
-                new Sphere(0.8, new Color(0, 255, 0)).translate(0, 1.2, 0).rotateZ(-65)
+                new Sphere(1, red).scale(1.2, 0.5, 1).translate(0, -1.5, 0),
+                new Sphere(0.8, green).translate(0, 1.2, 0).rotateZ(65),
+                new Sphere(0.8, green).translate(0, 1.2, 0).rotateZ(-65)
         );
 
         scene.addLights(
@@ -31,6 +36,24 @@ public class Main {
         ImagePanel imagePanel = getRenderedImage(window.getSize());
         window.addResizeListener(size -> imagePanel.updateImage(scene.renderImage(size)));
         window.setImage(imagePanel);
+
+        window.addSlider("Roughness", 0, 100, (int) (green.getRoughness() * 100), e -> {
+            Object eventSource = e.getSource();
+            if (!(eventSource instanceof JSlider)) return;
+
+            JSlider slider = (JSlider) eventSource;
+            green.setRoughness(slider.getValue() / 100.0);
+            imagePanel.updateImage(scene.renderImage(window.getSize()));
+        });
+
+        window.addSlider("Metalness", 0, 100, (int) (green.getMetalness() * 100), e -> {
+            Object eventSource = e.getSource();
+            if (!(eventSource instanceof JSlider)) return;
+
+            JSlider slider = (JSlider) eventSource;
+            green.setMetalness(slider.getValue() / 100.0);
+            imagePanel.updateImage(scene.renderImage(window.getSize()));
+        });
     }
 
     private ImagePanel getRenderedImage(Dimension size) {

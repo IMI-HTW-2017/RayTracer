@@ -2,6 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.Light;
 import de.kaes3kuch3n.raytracer.objects.Quadric;
+import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
@@ -125,16 +126,24 @@ public class Scene {
             // ---------- //
              */
             Vector3 normalVector = quadric.getNormalVector(rayHit.position);
-            double lightCos = Vector3.dot(lightDirection, normalVector);
-            if (lightCos < 0)
-                lightCos = 0;
 
-            r += (lightCos * light.getColor().getRed() * light.getIntensity()) * quadric.getColorRatio().x;
-            g += (lightCos * light.getColor().getGreen() * light.getIntensity()) * quadric.getColorRatio().y;
-            b += (lightCos * light.getColor().getBlue() * light.getIntensity()) * quadric.getColorRatio().z;
-            r = Math.min(r, 255);
-            g = Math.min(g, 255);
-            b = Math.min(b, 255);
+            Material quadricMaterial = quadric.getMaterial();
+
+            Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position);
+            Vector3 ks = quadricMaterial.getKs(normalVector, cameraDirection, Vector3.add(cameraDirection, lightDirection), lightDirection);
+            double metalness = quadricMaterial.getMetalness();
+
+            double kdr = (1 - ks.x) * (1 - metalness);
+            double kdg = (1 - ks.y) * (1 - metalness);
+            double kdb = (1 - ks.z) * (1 - metalness);
+
+            r += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getRed() * (kdr * quadricMaterial.getColorRatio().x + ks.x);
+            g += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getGreen() * (kdg * quadricMaterial.getColorRatio().y + ks.y);
+            b += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getBlue() * (kdb * quadricMaterial.getColorRatio().z + ks.z);
+
+            r = Math.min(Math.max(0, r), 255);
+            g = Math.min(Math.max(0, g), 255);
+            b = Math.min(Math.max(0, b), 255);
         }
         return new Color(r, g, b).getRGB();
     }

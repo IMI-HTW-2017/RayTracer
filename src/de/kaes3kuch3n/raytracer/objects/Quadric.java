@@ -1,22 +1,21 @@
 package de.kaes3kuch3n.raytracer.objects;
 
+import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.MatrixHelper;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import java.awt.*;
-
 public class Quadric {
 
     private RealMatrix q;
     private double a, b, c, d, e, f, g, h, i, j;
-    private Color color;
+    private Material material;
 
-    public Quadric(RealMatrix q, Color color) {
+    public Quadric(RealMatrix q, Material material) {
         this.q = q;
-        this.color = color;
+        this.material = material;
         updateValues();
     }
 
@@ -83,8 +82,8 @@ public class Quadric {
         ).normalized();
     }
 
-    public Vector3 getColorRatio() {
-        return new Vector3(color.getRed() / 255d, color.getGreen() / 255d, color.getBlue() / 255d);
+    public Material getMaterial() {
+        return material;
     }
 
     private Quadric transform(RealMatrix transformationMatrix) {

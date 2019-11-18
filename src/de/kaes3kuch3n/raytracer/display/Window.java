@@ -1,6 +1,7 @@
 package de.kaes3kuch3n.raytracer.display;
 
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -10,6 +11,7 @@ public class Window {
     private JFrame window;
     private Timer resizeTimer;
     private Dimension previousSize;
+    private JPanel sliderPanel;
 
     /**
      * Create a new window instance with a fixed inner width and height
@@ -17,9 +19,13 @@ public class Window {
      * @param height The height of the window's content pane
      */
     public Window(int width, int height) {
+        sliderPanel = new JPanel();
+        sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.PAGE_AXIS));
+
         window = new JFrame("Ray Tracer");
         window.setSize(width, height);
         window.getContentPane().setSize(width, height);
+        window.add(sliderPanel, BorderLayout.SOUTH);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
@@ -32,7 +38,20 @@ public class Window {
      * @param imagePanel The image panel containing the image to show
      */
     public void setImage(ImagePanel imagePanel) {
-        window.setContentPane(imagePanel);
+        window.getContentPane().add(imagePanel, BorderLayout.CENTER);
+        window.pack();
+    }
+
+    public void addSlider(String name, int min, int max, int value, ChangeListener changeListener) {
+        JLabel label = new JLabel(name);
+        JSlider slider = new JSlider(min, max, value);
+        slider.addChangeListener(changeListener);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+        panel.add(label);
+        panel.add(slider);
+        sliderPanel.add(panel);
         window.pack();
     }
 
