@@ -1,5 +1,6 @@
 package de.kaes3kuch3n.raytracer.objects;
 
+import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Operator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -14,8 +15,8 @@ public class CSG extends Quadric {
     private Operator operator;
 
 
-    public CSG(RealMatrix q, Color color) {
-        super(q, color);
+    public CSG(Quadric quadric) {
+        first = quadric;
     }
 
     public <T extends Quadric> CSG(T first, T second, Operator operator) {
@@ -23,85 +24,85 @@ public class CSG extends Quadric {
         this.second = second;
         this.operator = operator;
     }
-/*
-    public void combine(CSG second) {
-        addCSG(second, Operator.COMBINE);
-    }
 
-    public void subtract(CSG second) {
-        addCSG(second, Operator.SUBTRACT);
-    }
-
-    public void intersect(CSG second) {
-        addCSG(second, Operator.INTERSECT);
-    }
-*/
     public Ray.Hit getFirstRayHit(Ray ray) {
         SortedMap<Double, Ray.Hit> hits = getRayHitsRecursive(ray);
-        if(hits == null || hits.isEmpty())
+        if (hits == null || hits.isEmpty())
             return null;
         return hits.get(hits.firstKey());
     }
 
     private SortedMap<Double, Ray.Hit> getRayHitsRecursive(Ray ray) {
         SortedMap<Double, Ray.Hit> firstHits = getRayHitsForCSG(first, ray);
-        //No second CSG, no need to get the "lower" CSG
-        if (second == null)
+        SortedMap<Double, Ray.Hit> secondHits = getRayHitsForCSG(second, ray);
+
+        if (first == null)
+            return secondHits;
+        else if (second == null)
             return firstHits;
 
-        //Add all for second
-        SortedMap<Double, Ray.Hit> secondHits = getRayHitsForCSG(second, ray);
+        SortedMap<Double, Ray.Hit> allHits = new TreeMap<>();
 
         switch (operator) {
             case COMBINE:
-                //Second missed?
-                if (secondHits.isEmpty())
-                    return firstHits;
-                firstHits.putAll(secondHits);
+                if (firstHits.isEmpty() || secondHits.isEmpty()) {
+                    allHits.putAll(firstHits);
+                    allHits.putAll(secondHits);
+                    return allHits;
+                }
+                SortedMap<Double, Ray.Hit> firstHitsTemp = new TreeMap<>(firstHits);
+                SortedMap<Double, Ray.Hit> secondHitsTemp = new TreeMap<>(secondHits);
+                secondHitsTemp.subMap(firstHits.firstKey(), firstHits.lastKey()).clear();
+                firstHitsTemp.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
+
+                allHits.putAll(secondHitsTemp);
+                allHits.putAll(firstHitsTemp);
+
+
                 break;
             case SUBTRACT:
-                //Second missed?
-                if (secondHits.isEmpty())
+                //First missed? Second missed? First before second hit?
+                if (firstHits.isEmpty() || secondHits.isEmpty() || firstHits.firstKey() < secondHits.firstKey())
                     return firstHits;
-                if(firstHits.isEmpty() || firstHits.firstKey() < secondHits.firstKey())
-                    return firstHits;
-                if(firstHits.lastKey() < secondHits.lastKey())
+                //Going through the object
+                if (firstHits.lastKey() < secondHits.lastKey())
                     return null;
-
+                //Newly created hits (inside the object)
                 SortedMap<Double, Ray.Hit> newHits = secondHits.tailMap(firstHits.firstKey());
                 firstHits.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
                 newHits.forEach((distance, hit) -> hit.invertNormal());
-                firstHits.putAll(newHits);
+                allHits.putAll(firstHits);
+                allHits.putAll(newHits);
                 break;
             case INTERSECT:
-                if(firstHits.isEmpty() || secondHits.isEmpty())
+                if (firstHits.isEmpty() || secondHits.isEmpty())
                     return null;
-                if(firstHits.lastKey() < secondHits.firstKey() || secondHits.lastKey() < firstHits.firstKey())
+                if (firstHits.lastKey() < secondHits.firstKey() || secondHits.lastKey() < firstHits.firstKey())
                     return null;
-                SortedMap<Double, Ray.Hit> newMapFirst = firstHits;
-                if(firstHits.firstKey() < secondHits.firstKey()) {
-                    newMapFirst.subMap(secondHits.firstKey(), firstHits.lastKey());
-                    secondHits.subMap(secondHits.firstKey(), firstHits.lastKey());
-                }
-                else {
-                    newMapFirst.subMap(firstHits.firstKey(), secondHits.lastKey());
-                    secondHits.subMap(firstHits.firstKey(), secondHits.lastKey());
-                }
-                firstHits = newMapFirst;
-                firstHits.putAll(secondHits);
+
+                allHits.putAll(firstHits.subMap(secondHits.firstKey(), secondHits.lastKey()));
+                allHits.putAll(secondHits.subMap(firstHits.firstKey(), firstHits.lastKey()));
                 break;
         }
-        return firstHits;
+        return allHits;
     }
 
-    private SortedMap<Double, Ray.Hit> getRayHitsForCSG(Quadric obj, Ray ray) {
+    /**
+     * Returns all hits or an empty map if nothing hiz
+     *
+     * @param obj The current quadric-type object
+     * @param ray The current ray
+     * @return A map with all (or none) hits
+     */
+    private <T extends Quadric> SortedMap<Double, Ray.Hit> getRayHitsForCSG(T obj, Ray ray) {
         SortedMap<Double, Ray.Hit> hits = new TreeMap<>();
         SortedMap<Double, Ray.Hit> hitsTemp;
-        if(obj instanceof CSG)
+        if (obj instanceof CSG)
             hitsTemp = ((CSG) obj).getRayHitsRecursive(ray);
         else
             hitsTemp = obj.getRayHit(ray);
-        if(hitsTemp != null)
+
+        if (hitsTemp != null)
             hits.putAll(hitsTemp);
         return hits;
     }

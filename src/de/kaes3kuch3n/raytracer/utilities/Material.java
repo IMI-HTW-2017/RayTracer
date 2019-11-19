@@ -13,6 +13,14 @@ public class Material {
         this.metalness = metalness;
     }
 
+    public static Material CreateMetal(Color albedo, double metalness) {
+        return new Material(albedo, 0.001, metalness);
+    }
+
+    public static Material CreateRough(Color albedo, double roughness) {
+        return new Material(albedo, roughness, 0.001);
+    }
+
     public void setRoughness(double roughness) {
         this.roughness = roughness;
     }

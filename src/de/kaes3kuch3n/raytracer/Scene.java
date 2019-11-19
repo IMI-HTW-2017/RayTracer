@@ -23,10 +23,6 @@ public class Scene {
         this.camera = camera;
     }
 
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
-
     public void addCSGs(CSG... csgs) {
         this.csg.addAll(Arrays.asList(csgs));
     }
@@ -72,6 +68,8 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
+                if(x == imageSize.width / 2 && y == imageSize.height / 2)
+                    System.out.println();
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 RayHitResult minDistanceHit = null;
@@ -136,7 +134,7 @@ public class Scene {
             else
                 normalVector = rayHit.quadric.getNormalVector(rayHit.position).inverted();
 
-            Material quadricMaterial = quadric.getMaterial();
+            Material quadricMaterial = rayHit.quadric.getMaterial();
 
             Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position);
             Vector3 ks = quadricMaterial.getKs(normalVector, cameraDirection, Vector3.add(cameraDirection, lightDirection), lightDirection);
