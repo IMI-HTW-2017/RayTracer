@@ -68,25 +68,26 @@ public class Scene {
                 planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-                if(x == imageSize.width / 2 && y == imageSize.height / 2)
-                    System.out.println();
+                //Debug
+                //if(x == imageSize.width / 2 && y == imageSize.height / 2)
+                //    System.out.println();
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
-                RayHitResult minDistanceHit = null;
+                Ray.Hit closetHit = null;
                 for (CSG csg : csg) {
                     Ray.Hit rayHit = csg.getFirstRayHit(ray);
 
-                    //Current quadric not hit
+                    //Current csg not hit
                     if (rayHit == null)
                         continue;
-                    if (minDistanceHit == null || minDistanceHit.compareTo(rayHit) > 0)
-                        minDistanceHit = new RayHitResult(rayHit, csg);
+
+                    if (closetHit == null || closetHit.distance > rayHit.distance)
+                        closetHit = rayHit;
                 }
                 //No sphere hit
-                if (minDistanceHit == null)
+                if (closetHit == null)
                     continue;
-                //image.setRGB(x, y, new Color(255, 0, 0).getRGB());
-                image.setRGB(x, y, calculateColor(minDistanceHit.csg, minDistanceHit.rayHit));
+                image.setRGB(x, y, calculateColor(closetHit));
             }
         }
         return image;
@@ -94,12 +95,10 @@ public class Scene {
 
     /**
      * Calculates the color of a pixel using the provided quadric and rayhit. Uses all lights in the scene.
-     *
-     * @param csg The csg that was hit
      * @param rayHit The rayhit of the quadric and ray
      * @return The color of the pixel (RGB int)
      */
-    private int calculateColor(CSG csg, Ray.Hit rayHit) {
+    private int calculateColor(Ray.Hit rayHit) {
         int r = 0;
         int g = 0;
         int b = 0;
@@ -107,9 +106,35 @@ public class Scene {
             boolean skipFlag = false;
             //Light with normal vector
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
-            Ray rayToLight = new Ray(rayHit.position, lightDirection);
 
-            /*
+            //Invert normalVector if the surface is inverted
+            Vector3 normalVector;
+            if(!rayHit.invertedNormal)
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position);
+            else
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position).inverted();
+
+            Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position);
+
+            Material quadricMaterial = rayHit.quadric.getMaterial();
+            Vector3 ks = quadricMaterial.getKs(normalVector, cameraDirection, Vector3.add(cameraDirection, lightDirection), lightDirection);
+            double metalness = quadricMaterial.getMetalness();
+
+            double kdr = (1 - ks.x) * (1 - metalness);
+            double kdg = (1 - ks.y) * (1 - metalness);
+            double kdb = (1 - ks.z) * (1 - metalness);
+
+            r += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getRed() * (kdr * quadricMaterial.getColorRatio().x + ks.x);
+            g += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getGreen() * (kdg * quadricMaterial.getColorRatio().y + ks.y);
+            b += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getBlue() * (kdb * quadricMaterial.getColorRatio().z + ks.z);
+        }
+        r = Math.min(Math.max(0, r), 255);
+        g = Math.min(Math.max(0, g), 255);
+        b = Math.min(Math.max(0, b), 255);
+        return new Color(r, g, b).getRGB();
+    }
+
+    /*
             // ----- Shadows ----- //
 
             //Check if there is a quadric between the current quadric and the light source
@@ -128,51 +153,5 @@ public class Scene {
                 continue;
             // ---------- //
              */
-            Vector3 normalVector;
-            if(!rayHit.invertedNormal)
-                normalVector = rayHit.quadric.getNormalVector(rayHit.position);
-            else
-                normalVector = rayHit.quadric.getNormalVector(rayHit.position).inverted();
-
-            Material quadricMaterial = rayHit.quadric.getMaterial();
-
-            Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position);
-            Vector3 ks = quadricMaterial.getKs(normalVector, cameraDirection, Vector3.add(cameraDirection, lightDirection), lightDirection);
-            double metalness = quadricMaterial.getMetalness();
-
-            double kdr = (1 - ks.x) * (1 - metalness);
-            double kdg = (1 - ks.y) * (1 - metalness);
-            double kdb = (1 - ks.z) * (1 - metalness);
-
-            r += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getRed() * (kdr * quadricMaterial.getColorRatio().x + ks.x);
-            g += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getGreen() * (kdg * quadricMaterial.getColorRatio().y + ks.y);
-            b += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getBlue() * (kdb * quadricMaterial.getColorRatio().z + ks.z);
-
-            r = Math.min(Math.max(0, r), 255);
-            g = Math.min(Math.max(0, g), 255);
-            b = Math.min(Math.max(0, b), 255);
-        }
-        return new Color(r, g, b).getRGB();
-    }
-
-    /**
-     * Small class for saving ray hits and comparing them by their distance
-     */
-    private static class RayHitResult implements Comparable {
-        private Ray.Hit rayHit;
-        private CSG csg;
-
-        private RayHitResult(Ray.Hit rayHit, CSG csg) {
-            this.rayHit = rayHit;
-            this.csg = csg;
-        }
-
-        @Override
-        public int compareTo(Object o) {
-            if (!(o instanceof RayHitResult))
-                throw new ClassCastException();
-            return Double.compare(this.rayHit.distance, ((RayHitResult) o).rayHit.distance);
-        }
-    }
 
 }

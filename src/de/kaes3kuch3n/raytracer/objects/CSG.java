@@ -14,6 +14,12 @@ public class CSG extends Quadric {
     private Quadric second;
     private Operator operator;
 
+    /**
+     * Used for excluding the first key of a tree-map
+     */
+    @SuppressWarnings("FieldCanBeLocal")
+    private static Double SMALL_VALUE = 0.000001d;
+
 
     public CSG(Quadric quadric) {
         first = quadric;
@@ -52,7 +58,8 @@ public class CSG extends Quadric {
                 }
                 SortedMap<Double, Ray.Hit> firstHitsTemp = new TreeMap<>(firstHits);
                 SortedMap<Double, Ray.Hit> secondHitsTemp = new TreeMap<>(secondHits);
-                secondHitsTemp.subMap(firstHits.firstKey(), firstHits.lastKey()).clear();
+
+                secondHitsTemp.subMap(firstHits.firstKey() + SMALL_VALUE, firstHits.lastKey()).clear();
                 firstHitsTemp.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
 
                 allHits.putAll(secondHitsTemp);

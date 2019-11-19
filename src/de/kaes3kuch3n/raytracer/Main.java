@@ -22,21 +22,21 @@ public class Main {
         scene = new Scene(camera);
 
         Material red = Material.CreateRough(new Color(255, 0, 0), 0.01);
-        Material blue = Material.CreateMetal(new Color(0, 0, 255), 0.3);
         Material green = Material.CreateRough(new Color(0, 255, 0), 0.7);
+        Material blue = Material.CreateMetal(new Color(0, 0, 255), 0.3);
 
         Quadric sphere1 = new Sphere(1, red).translate(0.3, 0, 0);
         Quadric sphere2 = new Sphere(1, blue).translate(-0.3, 0, 0);
-        Quadric sphere3 = new Sphere(1, green).translate(0, 0.6, 0);
+        Quadric sphere3 = new Sphere(1, green).translate(0, -0.6, 0);
 
         CSG csg1 = new CSG(sphere1, sphere2, Operator.COMBINE);
-        CSG csg2 = new CSG(sphere3, csg1, Operator.INTERSECT);
+        CSG csg2 = new CSG(sphere3, csg1, Operator.COMBINE);
 
         scene.addCSGs(csg2);
 
 
         scene.addLights(
-                new Light(new Vector3(0, 0, 3), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(3, 0, 3), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 0, 1), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );
