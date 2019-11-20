@@ -6,8 +6,8 @@ import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
 import de.kaes3kuch3n.raytracer.objects.Quadric;
 import de.kaes3kuch3n.raytracer.objects.Sphere;
+import de.kaes3kuch3n.raytracer.utilities.CSGOperator;
 import de.kaes3kuch3n.raytracer.utilities.Material;
-import de.kaes3kuch3n.raytracer.utilities.Operator;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
 import javax.swing.*;
@@ -29,8 +29,8 @@ public class Main {
         Quadric sphere2 = new Sphere(1, blue).translate(-0.3, 0, 0);
         Quadric sphere3 = new Sphere(1, green).translate(0, -0.6, 0);
 
-        CSG csg1 = new CSG(sphere1, sphere2, Operator.COMBINE);
-        CSG csg2 = new CSG(sphere3, csg1, Operator.COMBINE);
+        CSG csg1 = new CSG(sphere1, sphere2, CSGOperator.COMBINE);
+        CSG csg2 = new CSG(sphere3, csg1, CSGOperator.COMBINE);
 
         scene.addCSGs(csg2);
 

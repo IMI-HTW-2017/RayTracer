@@ -1,18 +1,15 @@
 package de.kaes3kuch3n.raytracer.objects;
 
-import de.kaes3kuch3n.raytracer.utilities.Material;
-import de.kaes3kuch3n.raytracer.utilities.Operator;
+import de.kaes3kuch3n.raytracer.utilities.CSGOperator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
-import org.apache.commons.math3.linear.RealMatrix;
 
-import java.awt.*;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class CSG extends Quadric {
     private Quadric first;
     private Quadric second;
-    private Operator operator;
+    private CSGOperator operator;
 
     /**
      * Used for excluding the first key of a tree-map
@@ -25,7 +22,7 @@ public class CSG extends Quadric {
         first = quadric;
     }
 
-    public <T extends Quadric> CSG(T first, T second, Operator operator) {
+    public <T extends Quadric> CSG(T first, T second, CSGOperator operator) {
         this.first = first;
         this.second = second;
         this.operator = operator;

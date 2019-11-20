@@ -41,39 +41,40 @@ public class Material {
         return metalness;
     }
 
-    public Vector3 getKs(Vector3 n, Vector3 v, Vector3 h, Vector3 l) {
-        n = n.normalized();
-        v = v.normalized();
-        h = h.normalized();
-        l = l.normalized();
+    public Vector3 getSpecularComponent(Vector3 normalVector, Vector3 toCameraVector, Vector3 toLightVector) {
+        normalVector = normalVector.normalized();
+        toCameraVector = toCameraVector.normalized();
+        toLightVector = toLightVector.normalized();
 
-        double d = getD(n, h);
-        Vector3 f = getF(n, v);
-        double g = getG(n, v, l);
+        Vector3 h = Vector3.add(toCameraVector, toLightVector).divide(2).normalized();
+
+        double d = getDistribution(normalVector, h);
+        Vector3 f = getFresnel(normalVector, toCameraVector);
+        double g = getGeometry(normalVector, toCameraVector, toLightVector);
 
         return new Vector3(d * f.x * g, d * f.y * g, d * f.z * g);
     }
 
-    private double getD(Vector3 n, Vector3 h) {
+    private double getDistribution(Vector3 n, Vector3 h) {
         double squareRoughness = roughness * roughness;
         return squareRoughness / (Math.PI * Math.pow(Math.pow(Vector3.dot(n, h), 2) * (squareRoughness - 1) + 1, 2));
     }
 
-    private Vector3 getF(Vector3 n, Vector3 v) {
-        double f0r = getF0(albedo.getRed());
-        double f0g = getF0(albedo.getGreen());
-        double f0b = getF0(albedo.getBlue());
+    private Vector3 getFresnel(Vector3 n, Vector3 v) {
+        double f0r = getFresnelFactor(albedo.getRed());
+        double f0g = getFresnelFactor(albedo.getGreen());
+        double f0b = getFresnelFactor(albedo.getBlue());
         double r = f0r + (1 - f0r) * Math.pow(1 - Vector3.dot(n, v), 5);
         double g = f0g + (1 - f0g) * Math.pow(1 - Vector3.dot(n, v), 5);
         double b = f0b + (1 - f0b) * Math.pow(1 - Vector3.dot(n, v), 5);
         return new Vector3(r, g, b);
     }
 
-    private double getF0(double albedo) {
+    private double getFresnelFactor(double albedo) {
         return (1 - metalness) * 0.04 + metalness * albedo;
     }
 
-    private double getG(Vector3 n, Vector3 v, Vector3 l) {
+    private double getGeometry(Vector3 n, Vector3 v, Vector3 l) {
         double nDotV = Vector3.dot(n, v);
         double nDotL = Vector3.dot(n, l);
         double rDiv2 = roughness / 2;

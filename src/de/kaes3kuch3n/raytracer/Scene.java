@@ -2,8 +2,6 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.utilities.Operator;
-import de.kaes3kuch3n.raytracer.objects.Quadric;
 import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
@@ -102,35 +100,39 @@ public class Scene {
         int r = 0;
         int g = 0;
         int b = 0;
+
         for (Light light : lights) {
-            boolean skipFlag = false;
-            //Light with normal vector
+            Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position).normalized();
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
 
             //Invert normalVector if the surface is inverted
             Vector3 normalVector;
             if(!rayHit.invertedNormal)
-                normalVector = rayHit.quadric.getNormalVector(rayHit.position);
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized();
             else
-                normalVector = rayHit.quadric.getNormalVector(rayHit.position).inverted();
-
-            Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position);
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized().inverted();
 
             Material quadricMaterial = rayHit.quadric.getMaterial();
-            Vector3 ks = quadricMaterial.getKs(normalVector, cameraDirection, Vector3.add(cameraDirection, lightDirection), lightDirection);
+            Vector3 specularComponent = quadricMaterial.getSpecularComponent(normalVector, cameraDirection, lightDirection);
             double metalness = quadricMaterial.getMetalness();
+            double lightDot = Vector3.dot(normalVector, lightDirection);
 
-            double kdr = (1 - ks.x) * (1 - metalness);
-            double kdg = (1 - ks.y) * (1 - metalness);
-            double kdb = (1 - ks.z) * (1 - metalness);
+            double diffuseComponentRed = (1 - specularComponent.x) * (1 - metalness);
+            double diffuseComponentGreen = (1 - specularComponent.y) * (1 - metalness);
+            double diffuseComponentBlue = (1 - specularComponent.z) * (1 - metalness);
 
-            r += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getRed() * (kdr * quadricMaterial.getColorRatio().x + ks.x);
-            g += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getGreen() * (kdg * quadricMaterial.getColorRatio().y + ks.y);
-            b += light.getIntensity() * Vector3.dot(normalVector, lightDirection) * light.getColor().getBlue() * (kdb * quadricMaterial.getColorRatio().z + ks.z);
+            r += light.getIntensity() * lightDot * light.getColor().getRed() *
+                    (diffuseComponentRed * quadricMaterial.getColorRatio().x + specularComponent.x);
+            g += light.getIntensity() * lightDot * light.getColor().getGreen() *
+                    (diffuseComponentGreen * quadricMaterial.getColorRatio().y + specularComponent.y);
+            b += light.getIntensity() * lightDot * light.getColor().getBlue() *
+                    (diffuseComponentBlue * quadricMaterial.getColorRatio().z + specularComponent.z);
         }
+
         r = Math.min(Math.max(0, r), 255);
         g = Math.min(Math.max(0, g), 255);
         b = Math.min(Math.max(0, b), 255);
+
         return new Color(r, g, b).getRGB();
     }
 
