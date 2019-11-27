@@ -77,7 +77,7 @@ public class Material {
     private double getGeometry(Vector3 n, Vector3 v, Vector3 l) {
         double nDotV = Vector3.dot(n, v);
         double nDotL = Vector3.dot(n, l);
-        if(nDotL < 0)
+        if (nDotL < 0)
             return 0;
         double rDiv2 = roughness / 2;
         return nDotV / (nDotV * (1 - rDiv2) + rDiv2) * nDotL / (nDotL * (1 - rDiv2) + rDiv2);

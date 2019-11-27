@@ -7,7 +7,6 @@ import de.kaes3kuch3n.raytracer.utilities.Vector3;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import java.awt.*;
 import java.util.SortedMap;
 import java.util.TreeMap;
 

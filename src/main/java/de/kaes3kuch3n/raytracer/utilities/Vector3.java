@@ -25,7 +25,8 @@ public class Vector3 {
 
     /**
      * Adds two vectors
-     * @param first The first addend
+     *
+     * @param first  The first addend
      * @param second The second addend
      * @return The sum of the two vectors
      */
@@ -35,7 +36,8 @@ public class Vector3 {
 
     /**
      * Subtracts two vectors
-     * @param first The minuend
+     *
+     * @param first  The minuend
      * @param second The subtrahend
      * @return The difference between the two vectors
      */
@@ -45,6 +47,7 @@ public class Vector3 {
 
     /**
      * Multiplies a vector with a factor
+     *
      * @param factor The factor to multiply the vector with
      * @return The product vector of the vector and the factor
      */
@@ -64,7 +67,8 @@ public class Vector3 {
 
     /**
      * Calculates the dot product of two vectors
-     * @param first The first vector
+     *
+     * @param first  The first vector
      * @param second The second vector
      * @return The dot product of the two vectors
      */
@@ -74,7 +78,8 @@ public class Vector3 {
 
     /**
      * Calculates the cross product of two vectors
-     * @param first The first vector
+     *
+     * @param first  The first vector
      * @param second The second vector
      * @return The cross product of the two vectors
      */
@@ -87,6 +92,7 @@ public class Vector3 {
 
     /**
      * Inverts a vector
+     *
      * @return The inverted vector
      */
     public Vector3 inverted() {
@@ -95,6 +101,7 @@ public class Vector3 {
 
     /**
      * Normalizes a vector to a length of one
+     *
      * @param vector The vector to normalize
      * @return The normalized vector
      */
@@ -105,6 +112,7 @@ public class Vector3 {
 
     /**
      * Gets the magnitude of a vector
+     *
      * @param vector The vector to get the magnitude for
      * @return The magnitude of the vector
      */

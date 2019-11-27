@@ -15,6 +15,7 @@ public class Window {
 
     /**
      * Create a new window instance with a fixed inner width and height
+     *
      * @param width  The width of the window's content pane
      * @param height The height of the window's content pane
      */
@@ -35,6 +36,7 @@ public class Window {
 
     /**
      * Set an image for the window to display
+     *
      * @param imagePanel The image panel containing the image to show
      */
     public void setImage(ImagePanel imagePanel) {
@@ -57,6 +59,7 @@ public class Window {
 
     /**
      * Get the current inner size of the window
+     *
      * @return The window's inner size
      */
     public Dimension getSize() {
@@ -65,6 +68,7 @@ public class Window {
 
     /**
      * Add a window resize listener that is triggered every time the window's size changes
+     *
      * @param resizeAction The action to execute whenever the window is resized.
      *                     Provides access to the new inner dimension of the window
      */

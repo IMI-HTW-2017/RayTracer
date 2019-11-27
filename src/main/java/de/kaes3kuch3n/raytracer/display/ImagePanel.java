@@ -8,6 +8,7 @@ public class ImagePanel extends JPanel {
 
     /**
      * Create a new image panel
+     *
      * @param image The image the panel is supposed to display
      */
     public ImagePanel(Image image) {

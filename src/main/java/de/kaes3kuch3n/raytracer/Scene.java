@@ -93,6 +93,7 @@ public class Scene {
 
     /**
      * Calculates the color of a pixel using the provided quadric and rayhit. Uses all lights in the scene.
+     *
      * @param rayHit The rayhit of the quadric and ray
      * @return The color of the pixel (RGB int)
      */
@@ -107,7 +108,7 @@ public class Scene {
 
             //Invert normalVector if the surface is inverted
             Vector3 normalVector;
-            if(!rayHit.invertedNormal)
+            if (!rayHit.invertedNormal)
                 normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized();
             else
                 normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized().inverted();
