@@ -51,6 +51,11 @@ public class Ray {
             invertedNormal = true;
             return this;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof Hit && ((Hit) obj).quadric.equals(this.quadric);
+        }
     }
 }
 

@@ -3,8 +3,7 @@ package de.kaes3kuch3n.raytracer.objects;
 import de.kaes3kuch3n.raytracer.utilities.CSGOperator;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 public class CSG extends Quadric {
     private Quadric first;
@@ -72,11 +71,21 @@ public class CSG extends Quadric {
                 if (firstHits.lastKey() < secondHits.lastKey())
                     return null;
                 //Newly created hits (inside the object)
-                SortedMap<Double, Ray.Hit> newHits = secondHits.tailMap(firstHits.firstKey());
+                SortedMap<Double, Ray.Hit> temp = firstHits.subMap(secondHits.firstKey(), secondHits.lastKey());
+                Set<Quadric> insideQuadrics = new HashSet<>();
+                for (Ray.Hit hit : temp.values()) {
+                    if (!insideQuadrics.add(hit.quadric))
+                        insideQuadrics.remove(hit.quadric);
+                }
+
+                if (!insideQuadrics.isEmpty()) {
+                    SortedMap<Double, Ray.Hit> newHits = secondHits.tailMap(firstHits.firstKey());
+                    newHits.forEach((distance, hit) -> hit.invertNormal());
+                    allHits.putAll(newHits);
+                }
+
                 firstHits.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
-                newHits.forEach((distance, hit) -> hit.invertNormal());
                 allHits.putAll(firstHits);
-                allHits.putAll(newHits);
                 break;
             case INTERSECT:
                 if (firstHits.isEmpty() || secondHits.isEmpty())
@@ -84,10 +93,30 @@ public class CSG extends Quadric {
                 if (firstHits.lastKey() < secondHits.firstKey() || secondHits.lastKey() < firstHits.firstKey())
                     return null;
 
-                allHits.putAll(firstHits.subMap(secondHits.firstKey(), secondHits.lastKey()));
-                allHits.putAll(secondHits.subMap(firstHits.firstKey(), firstHits.lastKey()));
+                temp = firstHits.headMap(secondHits.lastKey());
+                List<Ray.Hit> hitsWithFirst = new ArrayList<>();
+                for (Ray.Hit hit : temp.values()) {
+                    if (hitsWithFirst.contains(hit) && hit.distance < secondHits.firstKey())
+                        hitsWithFirst.remove(hit);
+                    else
+                        hitsWithFirst.add(hit);
+                }
+                temp = secondHits.headMap(firstHits.lastKey());
+                List<Ray.Hit> hitsWithSecond = new ArrayList<>();
+                for (Ray.Hit hit : temp.values()) {
+                    if (hitsWithSecond.contains(hit) && hit.distance < firstHits.firstKey())
+                        hitsWithSecond.remove(hit);
+                    else
+                        hitsWithSecond.add(hit);
+                }
+                if(hitsWithSecond.size() > 0)
+                    allHits.putAll(firstHits.subMap(hitsWithSecond.get(0).distance, secondHits.lastKey()));
+                if(hitsWithFirst.size() > 0)
+                    allHits.putAll(secondHits.subMap(hitsWithFirst.get(0).distance, firstHits.lastKey()));
+
                 break;
         }
+
         return allHits;
     }
 
@@ -99,6 +128,7 @@ public class CSG extends Quadric {
      * @return A map with all (or none) hits
      */
     private <T extends Quadric> SortedMap<Double, Ray.Hit> getRayHitsForCSG(T obj, Ray ray) {
+        if (obj == null) return null;
         SortedMap<Double, Ray.Hit> hits = new TreeMap<>();
         SortedMap<Double, Ray.Hit> hitsTemp;
         if (obj instanceof CSG)

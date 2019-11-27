@@ -65,7 +65,7 @@ public class Quadric {
 
         // Edge-case (tangent)
         double radicand = bb * bb - 4 * aa * cc;
-        if (radicand < 0)
+        if (radicand <= 0)
             return null;
 
 
