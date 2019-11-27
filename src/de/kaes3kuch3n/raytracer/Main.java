@@ -23,7 +23,7 @@ public class Main {
 
         Material red = Material.CreateRough(new Color(255, 0, 0), 0.01);
         Material green = Material.CreateRough(new Color(0, 255, 0), 0.7);
-        Material blue = Material.CreateMetal(new Color(0, 0, 255), 0.3);
+        Material blue = Material.CreateMetal(new Color(184, 115, 51), 0.3);
 
         Quadric sphere1 = new Sphere(1, red).translate(0.3, 0, 0);
         Quadric sphere2 = new Sphere(1, blue).translate(-0.3, 0, 0);
@@ -34,9 +34,8 @@ public class Main {
 
         scene.addCSGs(csg2);
 
-
         scene.addLights(
-                new Light(new Vector3(3, 0, 3), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(-3, 0, 3), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 0, 1), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );
@@ -45,21 +44,21 @@ public class Main {
         window.addResizeListener(size -> imagePanel.updateImage(scene.renderImage(size)));
         window.setImage(imagePanel);
 
-        window.addSlider("Roughness", 0, 100, (int) (blue.getRoughness() * 100), e -> {
+        window.addSlider("Roughness", 1, 1000, (int) (blue.getRoughness() * 10000), e -> {
             Object eventSource = e.getSource();
             if (!(eventSource instanceof JSlider)) return;
 
             JSlider slider = (JSlider) eventSource;
-            blue.setRoughness(slider.getValue() / 100.0);
+            blue.setRoughness(slider.getValue() / 10000.0);
             imagePanel.updateImage(scene.renderImage(window.getSize()));
         });
 
-        window.addSlider("Metalness", 0, 100, (int) (blue.getMetalness() * 100), e -> {
+        window.addSlider("Metalness", 1, 10000, (int) (blue.getMetalness() * 10000), e -> {
             Object eventSource = e.getSource();
             if (!(eventSource instanceof JSlider)) return;
 
             JSlider slider = (JSlider) eventSource;
-            blue.setMetalness(slider.getValue() / 100.0);
+            blue.setMetalness(slider.getValue() / 10000.0);
             imagePanel.updateImage(scene.renderImage(window.getSize()));
         });
     }

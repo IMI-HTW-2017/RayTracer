@@ -15,7 +15,7 @@ public class CSG extends Quadric {
      * Used for excluding the first key of a tree-map
      */
     @SuppressWarnings("FieldCanBeLocal")
-    private static Double SMALL_VALUE = 0.000001d;
+    private static Double SMALL_VALUE = 0.0000000001d;
 
 
     public CSG(Quadric quadric) {
