@@ -36,20 +36,21 @@ public class Ray {
     }
 
     public static class Hit {
+        public Ray ray;
         public Vector3 position;
         public double distance;
         public Quadric quadric;
         public boolean invertedNormal;
 
-        public Hit(Vector3 position, double distance, Quadric quadric) {
+        public Hit(Ray ray, Vector3 position, double distance, Quadric quadric) {
+            this.ray = ray;
             this.position = position;
             this.distance = distance;
             this.quadric = quadric;
         }
 
-        public Hit invertNormal() {
+        public void invertNormal() {
             invertedNormal = true;
-            return this;
         }
 
         @Override

@@ -6,22 +6,24 @@ public class Material {
     private Vector3 albedo;
     private double roughness;
     private double metalness;
+    private double reflectivity;
 
-    public Material(Color albedo, double roughness, double metalness) {
+    public Material(Color albedo, double roughness, double metalness, double reflectivity) {
         this.albedo = new Vector3(
                 Math.pow(albedo.getRed() / 255d, Consts.GAMMA),
                 Math.pow(albedo.getGreen() / 255d, Consts.GAMMA),
                 Math.pow(albedo.getBlue() / 255d, Consts.GAMMA));
         this.roughness = roughness;
         this.metalness = metalness;
+        this.reflectivity = reflectivity;
     }
 
-    public static Material CreateMetal(Color albedo, double metalness) {
-        return new Material(albedo, 0.001, metalness);
+    public static Material CreateMetal(Color albedo, double metalness, double reflectivity) {
+        return new Material(albedo, 0.001, metalness, reflectivity);
     }
 
-    public static Material CreateRough(Color albedo, double roughness) {
-        return new Material(albedo, roughness, 0.001);
+    public static Material CreateRough(Color albedo, double roughness, double reflectivity) {
+        return new Material(albedo, roughness, 0.001, reflectivity);
     }
 
     public void setRoughness(double roughness) {
@@ -42,6 +44,10 @@ public class Material {
 
     public double getMetalness() {
         return metalness;
+    }
+
+    public double getReflectivity() {
+        return reflectivity;
     }
 
     public Vector3 getSpecularComponent(Vector3 normalVector, Vector3 toCameraVector, Vector3 toLightVector) {
