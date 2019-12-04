@@ -103,7 +103,7 @@ public class Scene {
      */
     private int calculateColor(CSG currentCSG, Ray.Hit rayHit) {
 
-        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, 1 - rayHit.quadric.getMaterial().getReflectivity());
+        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, rayHit.quadric.getMaterial().getReflectivity());
 
         int r = (int) (Math.pow(color.x, 1 / Consts.GAMMA) * 255);
         int g = (int) (Math.pow(color.y, 1 / Consts.GAMMA) * 255);
@@ -119,30 +119,31 @@ public class Scene {
     private Vector3 calculateColorRecursive(CSG currentCSG, Ray.Hit rayHit, int step, double weight) {
 
         // Recursion limit reached
-        if (weight < Consts.WEIGHT_MIN || step > Consts.REFLECTION_MAX)
+        if (step > Consts.REFLECTION_MAX)
             return new Vector3(0, 0, 0);
 
         double r = 0;
         double g = 0;
         double b = 0;
 
+        Vector3 normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized();
+        //Invert normalVector if the surface is inverted
+        if (rayHit.invertedNormal)
+            normalVector = normalVector.inverted();
+
+        Vector3 rayDirection = rayHit.ray.getDirection().normalized();
+        // Add small value to prevent hitting itself
+        Vector3 rayOrigin = Vector3.add(rayHit.position, normalVector.multiply(Consts.SMALL_VALUE));
+
+        Material quadricMaterial = rayHit.quadric.getMaterial();
+
         for (Light light : lights) {
 
-            Vector3 rayDirection = rayHit.ray.getDirection().inverted().normalized();
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
-
-            //Invert normalVector if the surface is inverted
-            Vector3 normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized();
-            if (rayHit.invertedNormal)
-                normalVector = normalVector.inverted();
-
-            // Add small value to prevent hitting itself
-            Vector3 rayOrigin = Vector3.add(rayHit.position, normalVector.multiply(Consts.SMALL_VALUE));
             if (isShadowed(currentCSG, new Ray(rayOrigin, lightDirection)))
                 continue;
 
-            Material quadricMaterial = rayHit.quadric.getMaterial();
-            Vector3 specularComponent = quadricMaterial.getSpecularComponent(normalVector, rayDirection, lightDirection);
+            Vector3 specularComponent = quadricMaterial.getSpecularComponent(normalVector, rayDirection.inverted(), lightDirection);
             double metalness = quadricMaterial.getMetalness();
             double lightDot = Vector3.dot(normalVector, lightDirection);
 
@@ -157,10 +158,31 @@ public class Scene {
             b += light.getIntensity() * lightDot * light.getColor().z *
                     (diffuseComponentBlue * quadricMaterial.getColor().z + specularComponent.z);
         }
-        if (rayHit.quadric.getMaterial().getReflectivity() == 0)
+        if (quadricMaterial.getReflectivity() == 0)
             return new Vector3(r, g, b);
 
-        return new Vector3(r, g, b);
+        Vector3 newDirection = Vector3.subtract(rayDirection, normalVector.multiply(2 * Vector3.dot(normalVector, rayDirection)));
+        Ray ray = new Ray(rayOrigin, newDirection);
+        Ray.Hit closetHit = null;
+        CSG closestCSG = null;
+        for (CSG csg : csgs) {
+            rayHit = csg.getFirstRayHit(ray);
+            // csg not hit?
+            if (rayHit == null)
+                continue;
+
+            if (closetHit == null || closetHit.distance > rayHit.distance) {
+                closetHit = rayHit;
+                closestCSG = csg;
+            }
+        }
+        //No csg hit
+        if (closetHit == null)
+            return new Vector3(r * (1 - weight), g * (1 - weight), b * (1 - weight));
+
+        Vector3 color = calculateColorRecursive(closestCSG, closetHit, step + 1, quadricMaterial.getReflectivity() * weight);
+
+        return new Vector3(r * (1 - weight) + color.x * weight, g * (1 - weight) + color.y * weight, b * (1 - weight) + color.z * weight);
     }
 
     private boolean isShadowed(CSG currentCSG, Ray rayToLight) {
@@ -171,31 +193,9 @@ public class Scene {
                 continue;
             Ray.Hit otherRayHit = otherCSG.getFirstRayHit(rayToLight);
             //Something hit?
-            if (otherRayHit != null) {
+            if (otherRayHit != null)
                 return true;
-            }
         }
         return false;
     }
-
-    /*
-            // ----- Shadows ----- //
-
-            //Check if there is a quadric between the current quadric and the light source
-            for (Quadric otherQuadric : quadrics) {
-                //Skip if we are looking at the same quadric
-                if (otherQuadric == quadric)
-                    continue;
-                Ray.Hit otherRayHit = otherQuadric.getRayhit(rayToLight);
-                //Something hit? Skip coloring
-                if (otherRayHit != null) {
-                    skipFlag = true;
-                    break;
-                }
-            }
-            if (skipFlag)
-                continue;
-            // ---------- //
-             */
-
 }
