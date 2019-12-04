@@ -6,12 +6,12 @@ import java.awt.*;
 
 public class Light {
     private Vector3 position;
-    private Color color;
+    private Vector3 color;
     private float intensity;
 
     public Light(Vector3 position, Color color, float intensity) {
         this.position = position;
-        this.color = color;
+        this.color = new Vector3(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0);
         this.intensity = intensity;
     }
 
@@ -19,7 +19,7 @@ public class Light {
         return position;
     }
 
-    public Color getColor() {
+    public Vector3 getColor() {
         return color;
     }
 

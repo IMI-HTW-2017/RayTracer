@@ -3,12 +3,15 @@ package de.kaes3kuch3n.raytracer.utilities;
 import java.awt.*;
 
 public class Material {
-    private Color albedo;
+    private Vector3 albedo;
     private double roughness;
     private double metalness;
 
     public Material(Color albedo, double roughness, double metalness) {
-        this.albedo = albedo;
+        this.albedo = new Vector3(
+                Math.pow(albedo.getRed() / 255d, Consts.GAMMA),
+                Math.pow(albedo.getGreen() / 255d, Consts.GAMMA),
+                Math.pow(albedo.getBlue() / 255d, Consts.GAMMA));
         this.roughness = roughness;
         this.metalness = metalness;
     }
@@ -29,8 +32,8 @@ public class Material {
         this.metalness = metalness;
     }
 
-    public Vector3 getColorRatio() {
-        return new Vector3(albedo.getRed() / 255d, albedo.getGreen() / 255d, albedo.getBlue() / 255d);
+    public Vector3 getColor() {
+        return albedo;
     }
 
     public double getRoughness() {
@@ -61,9 +64,9 @@ public class Material {
     }
 
     private Vector3 getFresnel(Vector3 n, Vector3 v) {
-        double f0r = getFresnelFactor(albedo.getRed());
-        double f0g = getFresnelFactor(albedo.getGreen());
-        double f0b = getFresnelFactor(albedo.getBlue());
+        double f0r = getFresnelFactor(albedo.x);
+        double f0g = getFresnelFactor(albedo.y);
+        double f0b = getFresnelFactor(albedo.z);
         double r = f0r + (1 - f0r) * Math.pow(1 - Vector3.dot(n, v), 5);
         double g = f0g + (1 - f0g) * Math.pow(1 - Vector3.dot(n, v), 5);
         double b = f0b + (1 - f0b) * Math.pow(1 - Vector3.dot(n, v), 5);

@@ -1,6 +1,7 @@
 package de.kaes3kuch3n.raytracer.objects;
 
 import de.kaes3kuch3n.raytracer.utilities.CSGOperator;
+import de.kaes3kuch3n.raytracer.utilities.Consts;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 
 import java.util.*;
@@ -9,13 +10,6 @@ public class CSG extends Quadric {
     private Quadric first;
     private Quadric second;
     private CSGOperator operator;
-
-    /**
-     * Used for excluding the first key of a tree-map
-     */
-    @SuppressWarnings("FieldCanBeLocal")
-    private static Double SMALL_VALUE = 0.0000000001d;
-
 
     public CSG(Quadric quadric) {
         first = quadric;
@@ -55,12 +49,11 @@ public class CSG extends Quadric {
                 SortedMap<Double, Ray.Hit> firstHitsTemp = new TreeMap<>(firstHits);
                 SortedMap<Double, Ray.Hit> secondHitsTemp = new TreeMap<>(secondHits);
 
-                secondHitsTemp.subMap(firstHits.firstKey() + SMALL_VALUE, firstHits.lastKey()).clear();
+                secondHitsTemp.subMap(firstHits.firstKey() + Consts.SMALL_VALUE, firstHits.lastKey()).clear();
                 firstHitsTemp.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
 
                 allHits.putAll(secondHitsTemp);
                 allHits.putAll(firstHitsTemp);
-
 
                 break;
             case SUBTRACT:

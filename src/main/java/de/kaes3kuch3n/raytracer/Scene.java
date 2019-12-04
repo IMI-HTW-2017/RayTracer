@@ -2,6 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
+import de.kaes3kuch3n.raytracer.utilities.Consts;
 import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
@@ -98,9 +99,9 @@ public class Scene {
      * @return The color of the pixel (RGB int)
      */
     private int calculateColor(Ray.Hit rayHit) {
-        int r = 0;
-        int g = 0;
-        int b = 0;
+        double r = 0;
+        double g = 0;
+        double b = 0;
 
         for (Light light : lights) {
             Vector3 cameraDirection = Vector3.subtract(camera.getPosition(), rayHit.position).normalized();
@@ -122,19 +123,19 @@ public class Scene {
             double diffuseComponentGreen = (1 - specularComponent.y) * (1 - metalness);
             double diffuseComponentBlue = (1 - specularComponent.z) * (1 - metalness);
 
-            r += light.getIntensity() * lightDot * light.getColor().getRed() *
-                    (diffuseComponentRed * quadricMaterial.getColorRatio().x + specularComponent.x);
-            g += light.getIntensity() * lightDot * light.getColor().getGreen() *
-                    (diffuseComponentGreen * quadricMaterial.getColorRatio().y + specularComponent.y);
-            b += light.getIntensity() * lightDot * light.getColor().getBlue() *
-                    (diffuseComponentBlue * quadricMaterial.getColorRatio().z + specularComponent.z);
+            r += light.getIntensity() * lightDot * light.getColor().x *
+                    (diffuseComponentRed * quadricMaterial.getColor().x + specularComponent.x);
+            g += light.getIntensity() * lightDot * light.getColor().y *
+                    (diffuseComponentGreen * quadricMaterial.getColor().y + specularComponent.y);
+            b += light.getIntensity() * lightDot * light.getColor().z *
+                    (diffuseComponentBlue * quadricMaterial.getColor().z + specularComponent.z);
         }
 
-        r = Math.min(Math.max(0, r), 255);
-        g = Math.min(Math.max(0, g), 255);
-        b = Math.min(Math.max(0, b), 255);
+        r = Math.pow(r, 1 / Consts.GAMMA) * 255;
+        g = Math.pow(g, 1 / Consts.GAMMA) * 255;
+        b = Math.pow(b, 1 / Consts.GAMMA) * 255;
 
-        return new Color(r, g, b).getRGB();
+        return new Color((int) r, (int) g, (int) b).getRGB();
     }
 
     /*
