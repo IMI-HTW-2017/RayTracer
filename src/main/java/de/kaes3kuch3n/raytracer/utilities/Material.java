@@ -7,8 +7,10 @@ public class Material {
     private double roughness;
     private double metalness;
     private double reflectivity;
+    private double transparency;
+    private double refractionIndex;
 
-    public Material(Color albedo, double roughness, double metalness, double reflectivity) {
+    public Material(Color albedo, double roughness, double metalness, double reflectivity, double transparency, double refractionIndex) {
         this.albedo = new Vector3(
                 Math.pow(albedo.getRed() / 255d, Consts.GAMMA),
                 Math.pow(albedo.getGreen() / 255d, Consts.GAMMA),
@@ -16,14 +18,20 @@ public class Material {
         this.roughness = roughness;
         this.metalness = metalness;
         this.reflectivity = reflectivity;
+        this.transparency = transparency;
+        this.refractionIndex = refractionIndex;
     }
 
     public static Material CreateMetal(Color albedo, double metalness, double reflectivity) {
-        return new Material(albedo, 0.001, metalness, reflectivity);
+        return new Material(albedo, 0.001, metalness, reflectivity, 0, 0);
     }
 
     public static Material CreateRough(Color albedo, double roughness, double reflectivity) {
-        return new Material(albedo, roughness, 0.001, reflectivity);
+        return new Material(albedo, roughness, 0.001, reflectivity, 0, 0);
+    }
+
+    public static Material CreateTransparent(Color albedo, double roughness, double reflectivity, double transparency, double refractionIndex) {
+        return new Material(albedo, roughness, 0.001, reflectivity, transparency, refractionIndex);
     }
 
     public void setRoughness(double roughness) {
@@ -90,5 +98,13 @@ public class Material {
             return 0;
         double rDiv2 = roughness / 2;
         return nDotV / (nDotV * (1 - rDiv2) + rDiv2) * nDotL / (nDotL * (1 - rDiv2) + rDiv2);
+    }
+
+    public double getTransparency() {
+        return transparency;
+    }
+
+    public double getRefractionIndex() {
+        return refractionIndex;
     }
 }

@@ -2,10 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.utilities.Consts;
-import de.kaes3kuch3n.raytracer.utilities.Material;
-import de.kaes3kuch3n.raytracer.utilities.Ray;
-import de.kaes3kuch3n.raytracer.utilities.Vector3;
+import de.kaes3kuch3n.raytracer.utilities.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -68,28 +65,14 @@ public class Scene {
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
                 //Debug
-                //if(x == imageSize.width / 2 && y == imageSize.height / 2)
-                //    System.out.println();
+                if(x == imageSize.width / 2 + 10 && y == imageSize.height / 2)
+                    System.out.println();
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
-                Ray.Hit closetHit = null;
-                CSG closestCSG = null;
-                for (CSG csg : csgs) {
-                    Ray.Hit rayHit = csg.getFirstRayHit(ray);
-
-                    //Current csg not hit
-                    if (rayHit == null)
-                        continue;
-
-                    if (closetHit == null || closetHit.distance > rayHit.distance) {
-                        closetHit = rayHit;
-                        closestCSG = csg;
-                    }
-                }
-                //No sphere hit
-                if (closetHit == null)
+                Tuple<CSG, Ray.Hit> tuple = getClosestCSG(ray);
+                if (tuple == null)
                     continue;
-                image.setRGB(x, y, calculateColor(closestCSG, closetHit));
+                image.setRGB(x, y, calculateColor(tuple.getFirst(), tuple.getSecond()));
             }
         }
         return image;
@@ -102,8 +85,8 @@ public class Scene {
      * @return The color of the pixel (RGB int)
      */
     private int calculateColor(CSG currentCSG, Ray.Hit rayHit) {
-
-        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, rayHit.quadric.getMaterial().getReflectivity());
+        Material mat = rayHit.quadric.getMaterial();
+        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, mat.getReflectivity(), 1, mat.getTransparency());
 
         int r = (int) (Math.pow(color.x, 1 / Consts.GAMMA) * 255);
         int g = (int) (Math.pow(color.y, 1 / Consts.GAMMA) * 255);
@@ -116,10 +99,10 @@ public class Scene {
         return new Color(r, g, b).getRGB();
     }
 
-    private Vector3 calculateColorRecursive(CSG currentCSG, Ray.Hit rayHit, int step, double weight) {
+    private Vector3 calculateColorRecursive(CSG currentCSG, Ray.Hit rayHit, int reflectionStep, double reflectionWeight, int refractionStep, double refractionWeight) {
 
         // Recursion limit reached
-        if (step > Consts.REFLECTION_MAX)
+        if (reflectionStep > Consts.Reflection.MAX_STEPS ||refractionStep > Consts.Refraction.MAX_STEPS)
             return new Vector3(0, 0, 0);
 
         double r = 0;
@@ -140,33 +123,77 @@ public class Scene {
         for (Light light : lights) {
 
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
-            if (isShadowed(currentCSG, new Ray(rayOrigin, lightDirection)))
-                continue;
+            double shadowFactor = getShadowFactor(currentCSG, new Ray(rayOrigin, lightDirection));
 
             Vector3 specularComponent = quadricMaterial.getSpecularComponent(normalVector, rayDirection.inverted(), lightDirection);
             double metalness = quadricMaterial.getMetalness();
-            double lightDot = Vector3.dot(normalVector, lightDirection);
+            double lightDot = Math.max(0, Vector3.dot(normalVector, lightDirection));
+
 
             double diffuseComponentRed = (1 - specularComponent.x) * (1 - metalness);
             double diffuseComponentGreen = (1 - specularComponent.y) * (1 - metalness);
             double diffuseComponentBlue = (1 - specularComponent.z) * (1 - metalness);
 
             r += light.getIntensity() * lightDot * light.getColor().x *
-                    (diffuseComponentRed * quadricMaterial.getColor().x + specularComponent.x);
+                    (diffuseComponentRed * quadricMaterial.getColor().x + specularComponent.x) * (1 - shadowFactor);
             g += light.getIntensity() * lightDot * light.getColor().y *
-                    (diffuseComponentGreen * quadricMaterial.getColor().y + specularComponent.y);
+                    (diffuseComponentGreen * quadricMaterial.getColor().y + specularComponent.y) * (1 - shadowFactor);
             b += light.getIntensity() * lightDot * light.getColor().z *
-                    (diffuseComponentBlue * quadricMaterial.getColor().z + specularComponent.z);
+                    (diffuseComponentBlue * quadricMaterial.getColor().z + specularComponent.z) * (1 - shadowFactor);
         }
-        if (quadricMaterial.getReflectivity() == 0)
-            return new Vector3(r, g, b);
+        Vector3 color = new Vector3(r, g, b);
+        Vector3 reflectionColor = new Vector3(0, 0, 0);
+        Vector3 refractionColor = new Vector3(0, 0, 0);
+        // REFLECTION
+        if (quadricMaterial.getReflectivity() != 0 && reflectionWeight > Consts.Reflection.WEIGHT_MIN) {
+            Vector3 newDirection = Vector3.subtract(rayDirection, normalVector.multiply(2 * Vector3.dot(normalVector, rayDirection)));
+            Ray ray = new Ray(rayOrigin, newDirection);
+            Tuple<CSG, Ray.Hit> tuple = getClosestCSG(ray);
+            if(tuple == null)
+                reflectionColor = new Vector3(color.x * (1 - reflectionWeight), color.y * (1 - reflectionWeight), color.z * (1 - reflectionWeight));
+            else
+                reflectionColor = calculateColorRecursive(tuple.getFirst(), tuple.getSecond(),
+                        reflectionStep + 1, reflectionWeight * tuple.getSecond().quadric.getMaterial().getReflectivity(),
+                        refractionStep, refractionWeight);
+        }
+        // REFRACTION
+        if (quadricMaterial.getTransparency() != 0 && refractionWeight > Consts.Refraction.WEIGHT_MIN) {
+            double i = DEFAULT_REFRACTION_INDEX / quadricMaterial.getRefractionIndex();
+            double cosAngle = Vector3.dot(rayDirection.inverted(), normalVector);
+            double root = Math.sqrt(1 - i * i * (1 - cosAngle * cosAngle));
+            Vector3 refractionDirection = Vector3.add(rayDirection.multiply(i), normalVector.multiply(i * cosAngle - root));
+            rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
+            Tuple<CSG, Ray.Hit> tuple = getClosestCSG(new Ray(rayOrigin, refractionDirection));
+            if(tuple == null)
+                refractionColor = new Vector3(color.x * (1 - refractionWeight), color.y * (1 - refractionWeight), color.z * (1 - refractionWeight));
+            else {
+                rayHit = tuple.getSecond();
+                normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized().inverted();
+                rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
+                i = quadricMaterial.getRefractionIndex() / DEFAULT_REFRACTION_INDEX;
+                cosAngle = Vector3.dot(refractionDirection.inverted(), normalVector);
+                root = Math.sqrt(1 - i * i * (1 - cosAngle * cosAngle));
+                refractionDirection = Vector3.add(rayDirection.multiply(i), normalVector.multiply(i * cosAngle - root));
+                tuple = getClosestCSG(new Ray(rayOrigin, refractionDirection));
+                if(tuple == null)
+                    refractionColor = new Vector3(color.x * (1 - refractionWeight), color.y * (1 - refractionWeight), color.z * (1 - refractionWeight));
+                else
+                    refractionColor = calculateColorRecursive(tuple.getFirst(), tuple.getSecond(), reflectionStep, reflectionWeight,
+                            refractionStep + 1, refractionWeight * tuple.getSecond().quadric.getMaterial().getTransparency());
+            }
+        }
+        return new Vector3(
+                color.x * (1 - refractionWeight - reflectionWeight) + reflectionColor.x * reflectionWeight + refractionColor.x * refractionWeight,
+                color.y * (1 - refractionWeight - reflectionWeight) + reflectionColor.y * reflectionWeight + refractionColor.y * refractionWeight,
+                color.z * (1 - refractionWeight - reflectionWeight) + reflectionColor.z * reflectionWeight + refractionColor.z * refractionWeight
+        );
+    }
 
-        Vector3 newDirection = Vector3.subtract(rayDirection, normalVector.multiply(2 * Vector3.dot(normalVector, rayDirection)));
-        Ray ray = new Ray(rayOrigin, newDirection);
+    private Tuple<CSG, Ray.Hit> getClosestCSG(Ray ray) {
         Ray.Hit closetHit = null;
         CSG closestCSG = null;
         for (CSG csg : csgs) {
-            rayHit = csg.getFirstRayHit(ray);
+            Ray.Hit rayHit = csg.getFirstRayHit(ray);
             // csg not hit?
             if (rayHit == null)
                 continue;
@@ -176,16 +203,12 @@ public class Scene {
                 closestCSG = csg;
             }
         }
-        //No csg hit
-        if (closetHit == null)
-            return new Vector3(r * (1 - weight), g * (1 - weight), b * (1 - weight));
-
-        Vector3 color = calculateColorRecursive(closestCSG, closetHit, step + 1, quadricMaterial.getReflectivity() * weight);
-
-        return new Vector3(r * (1 - weight) + color.x * weight, g * (1 - weight) + color.y * weight, b * (1 - weight) + color.z * weight);
+        if(closetHit == null)
+            return null;
+        return new Tuple<>(closestCSG, closetHit);
     }
 
-    private boolean isShadowed(CSG currentCSG, Ray rayToLight) {
+    private double getShadowFactor(CSG currentCSG, Ray rayToLight) {
         //Check if there is a csg between the current csg and the light source
         for (CSG otherCSG : csgs) {
             //Skip if we are looking at the same csg
@@ -194,8 +217,12 @@ public class Scene {
             Ray.Hit otherRayHit = otherCSG.getFirstRayHit(rayToLight);
             //Something hit?
             if (otherRayHit != null)
-                return true;
+                return 1 - otherRayHit.quadric.getMaterial().getTransparency();
         }
-        return false;
+        return 0;
+    }
+
+    private Vector3 getRefractionRecursive(Ray ray, Vector3 color, double transparency, int step, double weight, double currentRefractionIndex) {
+        return null;
     }
 }

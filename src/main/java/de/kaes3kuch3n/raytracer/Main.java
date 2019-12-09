@@ -4,6 +4,7 @@ import de.kaes3kuch3n.raytracer.display.ImagePanel;
 import de.kaes3kuch3n.raytracer.display.Window;
 import de.kaes3kuch3n.raytracer.objects.*;
 import de.kaes3kuch3n.raytracer.utilities.CSGOperator;
+import de.kaes3kuch3n.raytracer.utilities.Consts;
 import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Vector3;
 
@@ -19,21 +20,20 @@ public class Main {
         scene = new Scene(camera);
 
         Material red = Material.CreateRough(new Color(255, 0, 0), 0.01, 0);
-        Material green = Material.CreateRough(new Color(0, 255, 0), 0.01, 0.99);
+        Material green = Material.CreateRough(new Color(0, 255, 0), 0.01, 0);
         Material blue = Material.CreateMetal(new Color(52, 157, 184), 0.3, 0.9);
-        Material white = Material.CreateMetal(new Color(255, 255, 255), 0.9, 0.99);
+        Material white = Material.CreateMetal(new Color(255, 255, 255), 0.9, 0.5);
+        Material transparent = Material.CreateTransparent(new Color(231, 255, 233), 0.1, 0, 0.999999, Consts.Refraction.GLASS);
 
-        Quadric sphere1 = new Sphere(1, red).translate(2.5, 0, 0);
-        Quadric sphere2 = new Sphere(2, green).translate(-1.5, 0, 0);
+        Quadric sphere1 = new Sphere(0.2, transparent).translate(0, 0, 1);
+        Quadric sphere2 = new Sphere(2, red).translate(0.5, 0, -2);
+        Quadric sphere3 = new Sphere(2, green).translate(-0.5, 0, -2);
+        CSG csg1 = new CSG(sphere2, sphere3, CSGOperator.COMBINE);
 
-        Quadric plane1 = new Plane(0,0,-1,white).translate(0,0, 5);
-        Quadric plane2 = new Plane(0,0,1,white).translate(0,0, -5);
-
-
-        scene.addCSGs(new CSG(plane1), new CSG(plane2), new CSG(sphere1));
+        scene.addCSGs(csg1, new CSG(sphere1));
 
         scene.addLights(
-                new Light(new Vector3(0, 0, 3), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(0, 0, 2), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 0, 1), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );
@@ -48,7 +48,7 @@ public class Main {
 
             JSlider slider = (JSlider) eventSource;
             double value = slider.getValue() / 5d;
-            sphere1.rotateY(value);
+            sphere3.rotateY(value);
             sphere2.rotateY(value);
 
 
