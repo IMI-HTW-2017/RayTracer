@@ -15,7 +15,7 @@ public class Main {
     private Scene scene;
 
     private void show() {
-        Camera camera = new Camera(new Vector3(0d, 0, 3d), new Vector3(0d, 0, 2), 0);
+        Camera camera = new Camera(new Vector3(0, 0, 5), new Vector3(0, 0, 4), 0);
         Window window = new Window(800, 800);
         scene = new Scene(camera);
 
@@ -23,17 +23,19 @@ public class Main {
         Material green = Material.CreateRough(new Color(0, 255, 0), 0.01, 0);
         Material blue = Material.CreateMetal(new Color(52, 157, 184), 0.3, 0.9);
         Material white = Material.CreateMetal(new Color(255, 255, 255), 0.9, 0.5);
-        Material transparent = Material.CreateTransparent(new Color(231, 255, 233), 0.1, 0, 0.999999, Consts.Refraction.GLASS);
+        Material transparent = Material.CreateTransparent(new Color(231, 255, 233), 0.1, 0.01, 0.99, Consts.Refraction.AIR);
 
         Quadric sphere1 = new Sphere(0.2, transparent).translate(0, 0, 1);
-        Quadric sphere2 = new Sphere(2, red).translate(0.5, 0, -2);
-        Quadric sphere3 = new Sphere(2, green).translate(-0.5, 0, -2);
+        Quadric sphere2 = new Sphere(1, red).translate(0, 0, -2);
+        Quadric sphere3 = new Sphere(2, green).translate(2, 0, -2);
+        Quadric cyl = new Cylinder(1, 0, 1, 0.5, transparent).translate(0, 0, 0);
+
         CSG csg1 = new CSG(sphere2, sphere3, CSGOperator.COMBINE);
 
-        scene.addCSGs(csg1, new CSG(sphere1));
+        scene.addCSGs(new CSG(sphere2), new CSG(sphere3), new CSG(cyl));
 
         scene.addLights(
-                new Light(new Vector3(0, 0, 2), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(0, 0, 4), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 0, 1), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );

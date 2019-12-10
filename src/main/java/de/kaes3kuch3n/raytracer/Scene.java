@@ -86,7 +86,7 @@ public class Scene {
      */
     private int calculateColor(CSG currentCSG, Ray.Hit rayHit) {
         Material mat = rayHit.quadric.getMaterial();
-        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, mat.getReflectivity(), 1, mat.getTransparency());
+        Vector3 color = calculateColorRecursive(currentCSG, rayHit, 1, mat.getReflectivity(), 1, mat.getTransparency(), Consts.Refraction.AIR);
 
         int r = (int) (Math.pow(color.x, 1 / Consts.GAMMA) * 255);
         int g = (int) (Math.pow(color.y, 1 / Consts.GAMMA) * 255);
@@ -99,10 +99,10 @@ public class Scene {
         return new Color(r, g, b).getRGB();
     }
 
-    private Vector3 calculateColorRecursive(CSG currentCSG, Ray.Hit rayHit, int reflectionStep, double reflectionWeight, int refractionStep, double refractionWeight) {
+    private Vector3 calculateColorRecursive(CSG currentCSG, Ray.Hit rayHit, int reflectionStep, double reflectionWeight, int refractionStep, double refractionWeight, double previousRefractionIndex) {
 
         // Recursion limit reached
-        if (reflectionStep > Consts.Reflection.MAX_STEPS ||refractionStep > Consts.Refraction.MAX_STEPS)
+        if (reflectionStep > Consts.Reflection.MAX_STEPS || refractionStep > Consts.Refraction.MAX_STEPS)
             return new Vector3(0, 0, 0);
 
         double r = 0;
@@ -154,11 +154,11 @@ public class Scene {
             else
                 reflectionColor = calculateColorRecursive(tuple.getFirst(), tuple.getSecond(),
                         reflectionStep + 1, reflectionWeight * tuple.getSecond().quadric.getMaterial().getReflectivity(),
-                        refractionStep, refractionWeight);
+                        refractionStep, refractionWeight, previousRefractionIndex);
         }
         // REFRACTION
         if (quadricMaterial.getTransparency() != 0 && refractionWeight > Consts.Refraction.WEIGHT_MIN) {
-            double i = DEFAULT_REFRACTION_INDEX / quadricMaterial.getRefractionIndex();
+            double i = previousRefractionIndex / quadricMaterial.getRefractionIndex();
             double cosAngle = Vector3.dot(rayDirection.inverted(), normalVector);
             double root = Math.sqrt(1 - i * i * (1 - cosAngle * cosAngle));
             Vector3 refractionDirection = Vector3.add(rayDirection.multiply(i), normalVector.multiply(i * cosAngle - root));
@@ -167,19 +167,8 @@ public class Scene {
             if(tuple == null)
                 refractionColor = new Vector3(color.x * (1 - refractionWeight), color.y * (1 - refractionWeight), color.z * (1 - refractionWeight));
             else {
-                rayHit = tuple.getSecond();
-                normalVector = rayHit.quadric.getNormalVector(rayHit.position).normalized().inverted();
-                rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
-                i = quadricMaterial.getRefractionIndex() / DEFAULT_REFRACTION_INDEX;
-                cosAngle = Vector3.dot(refractionDirection.inverted(), normalVector);
-                root = Math.sqrt(1 - i * i * (1 - cosAngle * cosAngle));
-                refractionDirection = Vector3.add(rayDirection.multiply(i), normalVector.multiply(i * cosAngle - root));
-                tuple = getClosestCSG(new Ray(rayOrigin, refractionDirection));
-                if(tuple == null)
-                    refractionColor = new Vector3(color.x * (1 - refractionWeight), color.y * (1 - refractionWeight), color.z * (1 - refractionWeight));
-                else
-                    refractionColor = calculateColorRecursive(tuple.getFirst(), tuple.getSecond(), reflectionStep, reflectionWeight,
-                            refractionStep + 1, refractionWeight * tuple.getSecond().quadric.getMaterial().getTransparency());
+                refractionColor = calculateColorRecursive(tuple.getFirst(), tuple.getSecond(), reflectionStep, reflectionWeight,
+                        refractionStep + 1, refractionWeight * tuple.getSecond().quadric.getMaterial().getTransparency(), quadricMaterial.getRefractionIndex());
             }
         }
         return new Vector3(

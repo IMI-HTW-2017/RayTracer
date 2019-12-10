@@ -75,12 +75,22 @@ public class Quadric {
         double distance2 = k / aa;
         TreeMap<Double, Ray.Hit> hits = new TreeMap<>();
         Ray.Hit firstHit = new Ray.Hit(ray, new Vector3(p.x + distance1 * v.x, p.y + distance1 * v.y, p.z + distance1 * v.z), distance1, this);
+        Ray.Hit secondHit = new Ray.Hit(ray, new Vector3(p.x + distance2 * v.x, p.y + distance2 * v.y, p.z + distance2 * v.z), distance2, this);
         // Negative distance? Nothing hit
+        if (distance1 < 0 && distance2 > 0) {
+            secondHit.invertNormal();
+            hits.put(distance2, secondHit);
+            return hits;
+        }
+        if (distance2 < 0 && distance1 > 0) {
+            firstHit.invertNormal();
+            hits.put(distance1, firstHit);
+            return hits;
+        }
         if (distance1 > 0)
-            hits.put(distance1, new Ray.Hit(ray, new Vector3(p.x + distance1 * v.x, p.y + distance1 * v.y, p.z + distance1 * v.z), distance1, this));
-        if(distance2 > 0)
-            hits.put(distance2, new Ray.Hit(ray, new Vector3(p.x + distance2 * v.x, p.y + distance2 * v.y, p.z + distance2 * v.z), distance2, this));
-
+            hits.put(distance1, firstHit);
+        if (distance2 > 0)
+            hits.put(distance2, secondHit);
         return hits;
     }
 
