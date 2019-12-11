@@ -49,7 +49,11 @@ public class CSG extends Quadric {
                 SortedMap<Double, Ray.Hit> firstHitsTemp = new TreeMap<>(firstHits);
                 SortedMap<Double, Ray.Hit> secondHitsTemp = new TreeMap<>(secondHits);
 
-                secondHitsTemp.subMap(firstHits.firstKey() + Consts.SMALL_VALUE, firstHits.lastKey()).clear();
+                try {
+                    secondHitsTemp.subMap(firstHits.firstKey() + Consts.SMALL_VALUE, firstHits.lastKey()).clear();
+                } catch (Exception e) {
+                    System.out.println();
+                }
                 firstHitsTemp.subMap(secondHits.firstKey(), secondHits.lastKey()).clear();
 
                 allHits.putAll(secondHitsTemp);

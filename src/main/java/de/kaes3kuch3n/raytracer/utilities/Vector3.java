@@ -106,18 +106,17 @@ public class Vector3 {
      * @return The normalized vector
      */
     public static Vector3 normalize(Vector3 vector) {
-        double magnitude = magnitude(vector);
+        double magnitude = vector.magnitude();
         return new Vector3(vector.x / magnitude, vector.y / magnitude, vector.z / magnitude);
     }
 
     /**
      * Gets the magnitude of a vector
      *
-     * @param vector The vector to get the magnitude for
      * @return The magnitude of the vector
      */
-    public static double magnitude(Vector3 vector) {
-        return Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+    public double magnitude() {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     /**

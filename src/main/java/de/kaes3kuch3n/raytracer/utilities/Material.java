@@ -66,25 +66,26 @@ public class Material {
         Vector3 h = Vector3.add(toCameraVector, toLightVector).divide(2).normalized();
 
         double d = getDistribution(normalVector, h);
-        Vector3 f = getFresnel(normalVector, toCameraVector);
+        Vector3 f = new Vector3(
+                getFresnel(normalVector, toCameraVector, getFresnelFactor(albedo.x)),
+                getFresnel(normalVector, toCameraVector, getFresnelFactor(albedo.y)),
+                getFresnel(normalVector, toCameraVector, getFresnelFactor(albedo.z))
+        );
         double g = getGeometry(normalVector, toCameraVector, toLightVector);
 
         return new Vector3(d * f.x * g, d * f.y * g, d * f.z * g);
     }
 
+    public double getFresnel(Vector3 n, Vector3 v, double f0) {
+        double nDotV = Vector3.dot(n, v);
+        if (nDotV < 0)
+            return 1;
+        return f0 + (1 - f0) * Math.pow(1 - nDotV, 5);
+    }
+
     private double getDistribution(Vector3 n, Vector3 h) {
         double squareRoughness = roughness * roughness;
         return squareRoughness / (Math.PI * Math.pow(Math.pow(Vector3.dot(n, h), 2) * (squareRoughness - 1) + 1, 2));
-    }
-
-    private Vector3 getFresnel(Vector3 n, Vector3 v) {
-        double f0r = getFresnelFactor(albedo.x);
-        double f0g = getFresnelFactor(albedo.y);
-        double f0b = getFresnelFactor(albedo.z);
-        double r = f0r + (1 - f0r) * Math.pow(1 - Vector3.dot(n, v), 5);
-        double g = f0g + (1 - f0g) * Math.pow(1 - Vector3.dot(n, v), 5);
-        double b = f0b + (1 - f0b) * Math.pow(1 - Vector3.dot(n, v), 5);
-        return new Vector3(r, g, b);
     }
 
     private double getFresnelFactor(double albedo) {
