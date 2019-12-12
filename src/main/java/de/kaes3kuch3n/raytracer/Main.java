@@ -21,9 +21,9 @@ public class Main {
         Material red = Material.CreateRough(new Color(255, 0, 0), 0.01, 0);
         Material green = Material.CreateRough(new Color(0, 255, 0), 0.01, 0);
         Material blue = Material.CreateMetal(new Color(52, 157, 184), 0.3, 0.9);
-        Material white = Material.CreateRough(new Color(255, 255, 255), 0.1, 0.5);
+        Material white = Material.CreateRough(new Color(255, 255, 255), 0.1, 0.4);
         Material white2 = Material.CreateRough(new Color(255, 255, 255), 0.9, 0.1);
-        Material transparent = Material.CreateTransparent(new Color(231, 255, 233), 0.1, 0.1, 0.999, Consts.Refraction.GLASS);
+        Material transparent = Material.CreateTransparent(new Color(184, 250, 255), 0.1, 0.3, 0.7, Consts.Refraction.WATER);
 
         //Cube
 //        Quadric left = new Plane(1, 0, 0, transparent).translate(1,0,0);
@@ -39,18 +39,19 @@ public class Main {
 //        CSG csg4 = new CSG(csg1, csg2, CSGOperator.INTERSECT);
 //        CSG csg5 = new CSG(csg3, csg4, CSGOperator.INTERSECT);
 
-        Quadric bottom = new Plane(0, 1, 0, white).translate(0, -5, 0).rotateX(-30);
-        Quadric sphere1 = new Sphere(6, blue).translate(0, 2, -5);
-        Quadric sphere2 = new Sphere(1, green).translate(-2, 2, -2);
-        Quadric sphere3 = new Sphere(1, red).translate(3, 2, 0).scale(1, 1, 3);
-        Quadric sphere4 = new Sphere(2, red).translate(0, 2, 8);
+        Quadric bottom = new Cylinder(0, 1, 1, 0.001, transparent).translate(0, -4, 0).scale(1, 1, 2000).rotateX(-20);
+        Quadric sphere1 = new Sphere(1, red).translate(0, -8, -3);
+        Quadric sphere2 = new Sphere(50, red).translate(0, -20, -50);
+        Quadric sphere3 = new Sphere(1, red).translate(-5, 0, -10);
+        Quadric sphere4 = new Sphere(1, red).translate(5, 3, -20);
+        Quadric sphere5 = new Sphere(50, red).translate(20, 15, -50);
         Quadric cyl1 = new Cylinder(0, 1, 1, 0.5, white2).translate(0, 0, -1);
 
 
-        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(cyl1), new CSG(sphere4));
+        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(sphere4), new CSG(sphere5));
 
         scene.addLights(
-                new Light(new Vector3(0, 0, 5), new Color(255, 255, 255), 1f)
+                new Light(new Vector3(0, 3, 5), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(3, 0, 1), new Color(255, 255, 255), 1f)
                 //new Light(new Vector3(0, 0, 15), new Color(255, 255, 255), 1f)
         );
