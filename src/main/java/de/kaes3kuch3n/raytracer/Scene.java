@@ -2,7 +2,6 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.objects.Sphere;
 import de.kaes3kuch3n.raytracer.utilities.Consts;
 import de.kaes3kuch3n.raytracer.utilities.Material;
 import de.kaes3kuch3n.raytracer.utilities.Ray;
@@ -107,7 +106,7 @@ public class Scene {
 
         // Recursion limit reached
         if (reflectionStep > Consts.Reflection.MAX_STEPS || refractionStep > Consts.Refraction.MAX_STEPS)
-            return new Vector3(0, 0, 0);
+            return new Vector3(new Color(0, 0, 0));
 
         double r = 0;
         double g = 0;
@@ -154,15 +153,13 @@ public class Scene {
         Material fresnelMaterial = new Material(quadricMaterial);
         fresnelMaterial.ApplyFresnel(fresnel);
 
-        if (rayHit.quadric instanceof Sphere)
-            System.out.println();
         // REFLECTION
         if (fresnelMaterial.getReflectivity() != 0 && reflectionWeight > Consts.Reflection.WEIGHT_MIN) {
             Vector3 newDirection = Vector3.subtract(rayDirection, normalVector.multiply(2 * Vector3.dot(normalVector, rayDirection)));
             Ray ray = new Ray(rayOrigin, newDirection);
             Ray.Hit newHit = getClosestCSG(ray);
             if (newHit == null)
-                reflectionColor = new Vector3(color.x * (1 - reflectionWeight), color.y * (1 - reflectionWeight), color.z * (1 - reflectionWeight));
+                reflectionColor = new Vector3(new Color(0, 0, 0));
             else {
                 double newReflectionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
                 double newRefractionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
@@ -179,7 +176,7 @@ public class Scene {
             rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
             Ray.Hit newHit = getClosestCSG(new Ray(rayOrigin, refractionDirection));
             if (newHit == null)
-                refractionColor = new Vector3(color.x * (1 - refractionWeight), color.y * (1 - refractionWeight), color.z * (1 - refractionWeight));
+                refractionColor = new Vector3(new Color(0, 0, 0));
             else {
                 double newReflectionWeight = refractionWeight * newHit.quadric.getMaterial().getReflectivity();
                 double newRefractionWeight = refractionWeight * newHit.quadric.getMaterial().getTransparency();

@@ -1,5 +1,7 @@
 package de.kaes3kuch3n.raytracer.utilities;
 
+import java.awt.*;
+
 public class Vector3 {
     public double x;
     public double y;
@@ -16,6 +18,10 @@ public class Vector3 {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public Vector3(Color color) {
+        this(color.getRed(), color.getGreen(), color.getBlue());
     }
 
     @Override

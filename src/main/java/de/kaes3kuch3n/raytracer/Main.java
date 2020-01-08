@@ -20,10 +20,10 @@ public class Main {
 
         Material red = Material.CreateRough(new Color(255, 0, 0), 0.01, 0);
         Material green = Material.CreateRough(new Color(0, 255, 0), 0.01, 0);
-        Material blue = Material.CreateMetal(new Color(52, 157, 184), 0.3, 0.9);
+        Material blue = Material.CreateRough(new Color(72, 219, 255), 0.9, 0);
         Material white = Material.CreateRough(new Color(255, 255, 255), 0.1, 0.4);
         Material white2 = Material.CreateRough(new Color(255, 255, 255), 0.9, 0.1);
-        Material transparent = Material.CreateTransparent(new Color(184, 250, 255), 0.1, 0.3, 0.7, Consts.Refraction.WATER);
+        Material transparent = Material.CreateTransparent(new Color(0, 0, 0), 0.1, 0.3, 0.7, Consts.Refraction.WATER);
 
         //Cube
 //        Quadric left = new Plane(1, 0, 0, transparent).translate(1,0,0);
@@ -40,13 +40,15 @@ public class Main {
 //        CSG csg5 = new CSG(csg3, csg4, CSGOperator.INTERSECT);
 
         Quadric bottom = new Plane(0, 1, 0, 1, transparent).translate(0, -4, 0).rotateX(0);
+        Quadric back = new Cylinder(0, 1, 1, 1, blue).translate(0, 0.8, -500).scale(1, 300, 1);
         Quadric sphere1 = new Sphere(1, red).translate(0, -8, -3);
-        Quadric sphere2 = new Sphere(50, red).translate(0, -18, -50);
+        Quadric sphere2 = new Sphere(50, red).translate(0, -18, -80);
         Quadric sphere3 = new Sphere(0.5, red).translate(-1.5, -2, 0);
-        Quadric sphere5 = new Sphere(50, red).translate(20, 6, -50);
+        Quadric sphere5 = new Sphere(50, red).translate(20, 6, -120);
+        Quadric cyl = new Cylinder(1, 1, 0, 1, green).translate(0, -10, 0).rotateX(0);
 
 
-        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(sphere5));
+        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(back), new CSG(sphere5), new CSG(cyl));
 
         scene.addLights(
                 new Light(new Vector3(0, 3, 5), new Color(255, 255, 255), 1f)
