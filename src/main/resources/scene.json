@@ -1,0 +1,128 @@
+{
+  "objects": [
+    {
+      "first": {
+        "first": {
+          "type": "SPHERE",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 2,
+            "y": 2,
+            "z": 2
+          },
+          "material": {
+            "albedo": {
+              "red": 1,
+              "green": 0,
+              "blue": 0
+            },
+            "roughness": 0.01,
+            "metalness": 0.001,
+            "reflectivity": 0,
+            "transparency": 0,
+            "refractionIndex": 1
+          }
+        },
+        "second": {
+          "type": "SPHERE",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": -1
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "scale": {
+            "x": 2,
+            "y": 2,
+            "z": 2
+          },
+          "material": {
+            "albedo": {
+              "red": 1,
+              "green": 0,
+              "blue": 0
+            },
+            "roughness": 0.01,
+            "metalness": 0.001,
+            "reflectivity": 0,
+            "transparency": 0,
+            "refractionIndex": 1
+          }
+        },
+        "operator": "INTERSECT"
+      },
+      "second": {
+        "type": "CYLINDER",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0.3
+        },
+        "rotation": {
+          "x": 0,
+          "y": 170,
+          "z": 0
+        },
+        "scale": {
+          "x": 0.5,
+          "y": 0.5,
+          "z": 0.5
+        },
+        "material": {
+          "albedo": {
+            "red": 1,
+            "green": 0,
+            "blue": 0
+          },
+          "roughness": 0.01,
+          "metalness": 0.001,
+          "reflectivity": 0,
+          "transparency": 0,
+          "refractionIndex": 1
+        }
+      },
+      "operator": "SUBTRACT"
+    }
+  ],
+  "lights": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 5
+      },
+      "color": {
+        "red": 1,
+        "green": 1,
+        "blue": 1
+      },
+      "intensity": 1
+    }
+  ],
+  "camera": {
+    "position": {
+      "x": 0,
+      "y": 0,
+      "z": 5
+    },
+    "focusPoint": {
+      "x": 0,
+      "y": 0,
+      "z": 4
+    },
+    "roll": 0
+  }
+}

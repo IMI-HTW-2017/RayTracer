@@ -7,9 +7,9 @@ import java.awt.*;
 public class Light {
     private Vector3 position;
     private Vector3 color;
-    private float intensity;
+    private double intensity;
 
-    public Light(Vector3 position, Color color, float intensity) {
+    public Light(Vector3 position, Color color, double intensity) {
         this.position = position;
         this.color = new Vector3(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0);
         this.intensity = intensity;
@@ -23,7 +23,7 @@ public class Light {
         return color;
     }
 
-    public float getIntensity() {
+    public double getIntensity() {
         return intensity;
     }
 }

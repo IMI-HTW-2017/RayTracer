@@ -1,0 +1,212 @@
+{
+  "objects": [
+    {
+      "type": "PLANE",
+      "position": {
+        "x": 0,
+        "y": -5,
+        "z": 0
+      },
+      "rotation": {
+        "x": 60,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "material": {
+        "albedo": {
+          "red": 1,
+          "green": 1,
+          "blue": 1
+        },
+        "roughness": 0.1,
+        "metalness": 0.001,
+        "reflectivity": 0.5,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    },
+    {
+      "type": "SPHERE",
+      "position": {
+        "x": 0,
+        "y": 2,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2.5,
+        "y": 2.5,
+        "z": 2.5
+      },
+      "material": {
+        "albedo": {
+          "red": 0.2,
+          "green": 0.62,
+          "blue": 0.72
+        },
+        "roughness": 0.001,
+        "metalness": 0.3,
+        "reflectivity": 0.9,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    },
+    {
+      "type": "SPHERE",
+      "position": {
+        "x": -2,
+        "y": 2,
+        "z": -2
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "material": {
+        "albedo": {
+          "red": 0,
+          "green": 1,
+          "blue": 0
+        },
+        "roughness": 0.01,
+        "metalness": 0.001,
+        "reflectivity": 0,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    },
+    {
+      "type": "SPHERE",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 3
+      },
+      "material": {
+        "albedo": {
+          "red": 1,
+          "green": 0,
+          "blue": 0
+        },
+        "roughness": 0.01,
+        "metalness": 0.001,
+        "reflectivity": 0,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    },
+    {
+      "type": "SPHERE",
+      "position": {
+        "x": 0,
+        "y": 2,
+        "z": 8
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "material": {
+        "albedo": {
+          "red": 1,
+          "green": 0,
+          "blue": 0
+        },
+        "roughness": 0.01,
+        "metalness": 0.001,
+        "reflectivity": 0,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    },
+    {
+      "type": "CYLINDER",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5
+      },
+      "material": {
+        "albedo": {
+          "red": 1,
+          "green": 1,
+          "blue": 1
+        },
+        "roughness": 0.9,
+        "metalness": 0.001,
+        "reflectivity": 0.1,
+        "transparency": 0,
+        "refractionIndex": 1
+      }
+    }
+  ],
+  "lights": [
+    {
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 5
+      },
+      "color": {
+        "red": 1,
+        "green": 1,
+        "blue": 1
+      },
+      "intensity": 1
+    }
+  ],
+  "camera": {
+    "position": {
+      "x": 0,
+      "y": 0,
+      "z": 5
+    },
+    "focusPoint": {
+      "x": 0,
+      "y": 0,
+      "z": 4
+    },
+    "roll": 0
+  }
+}
