@@ -69,7 +69,7 @@ public class Scene {
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
                 //Debug
-                if (x == imageSize.width / 2 - 50 && y == imageSize.height / 2 - 50)
+                if (x == imageSize.width / 3 && y == imageSize.height - 10)
                     System.out.println();
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
@@ -151,11 +151,13 @@ public class Scene {
 
         double f0 = quadricMaterial.getTransparency() == 0 ? 0.04 : Math.pow((previousRefractionIndex - quadricMaterial.getRefractionIndex()) / (previousRefractionIndex + quadricMaterial.getRefractionIndex()), 2);
         double fresnel = quadricMaterial.getFresnel(normalVector, rayDirection.inverted(), f0);
+        Material fresnelMaterial = new Material(quadricMaterial);
+        fresnelMaterial.ApplyFresnel(fresnel);
 
         if (rayHit.quadric instanceof Sphere)
             System.out.println();
         // REFLECTION
-        if (quadricMaterial.getReflectivity() != 0 && reflectionWeight > Consts.Reflection.WEIGHT_MIN) {
+        if (fresnelMaterial.getReflectivity() != 0 && reflectionWeight > Consts.Reflection.WEIGHT_MIN) {
             Vector3 newDirection = Vector3.subtract(rayDirection, normalVector.multiply(2 * Vector3.dot(normalVector, rayDirection)));
             Ray ray = new Ray(rayOrigin, newDirection);
             Ray.Hit newHit = getClosestCSG(ray);
@@ -169,8 +171,8 @@ public class Scene {
             }
         }
         // REFRACTION
-        if (quadricMaterial.getTransparency() != 0 && refractionWeight > Consts.Refraction.WEIGHT_MIN) {
-            double i = previousRefractionIndex / quadricMaterial.getRefractionIndex();
+        if (fresnelMaterial.getTransparency() != 0 && refractionWeight > Consts.Refraction.WEIGHT_MIN) {
+            double i = previousRefractionIndex / fresnelMaterial.getRefractionIndex();
             double cosAngle = Vector3.dot(rayDirection.inverted(), normalVector);
             double root = Math.sqrt(1 - i * i * (1 - cosAngle * cosAngle));
             Vector3 refractionDirection = Vector3.add(rayDirection.multiply(i), normalVector.multiply(i * cosAngle - root));
@@ -182,13 +184,13 @@ public class Scene {
                 double newReflectionWeight = refractionWeight * newHit.quadric.getMaterial().getReflectivity();
                 double newRefractionWeight = refractionWeight * newHit.quadric.getMaterial().getTransparency();
                 refractionColor = calculateColorRecursive(newHit, reflectionStep, newReflectionWeight,
-                        refractionStep + 1, newRefractionWeight, quadricMaterial.getRefractionIndex()).multiply(refractionWeight * (1 - fresnel));
+                        refractionStep + 1, newRefractionWeight, fresnelMaterial.getRefractionIndex()).multiply(refractionWeight * (1 - fresnel));
             }
         }
         return new Vector3(
-                color.x * (1 - quadricMaterial.getTransparency() - quadricMaterial.getReflectivity()) + reflectionColor.x * quadricMaterial.getReflectivity() + refractionColor.x * quadricMaterial.getTransparency(),
-                color.y * (1 - quadricMaterial.getTransparency() - quadricMaterial.getReflectivity()) + reflectionColor.y * quadricMaterial.getReflectivity() + refractionColor.y * quadricMaterial.getTransparency(),
-                color.z * (1 - quadricMaterial.getTransparency() - quadricMaterial.getReflectivity()) + reflectionColor.z * quadricMaterial.getReflectivity() + refractionColor.z * quadricMaterial.getTransparency()
+                color.x * (1 - fresnelMaterial.getTransparency() - fresnelMaterial.getReflectivity()) + reflectionColor.x * fresnelMaterial.getReflectivity() + refractionColor.x * fresnelMaterial.getTransparency(),
+                color.y * (1 - fresnelMaterial.getTransparency() - fresnelMaterial.getReflectivity()) + reflectionColor.y * fresnelMaterial.getReflectivity() + refractionColor.y * fresnelMaterial.getTransparency(),
+                color.z * (1 - fresnelMaterial.getTransparency() - fresnelMaterial.getReflectivity()) + reflectionColor.z * fresnelMaterial.getReflectivity() + refractionColor.z * fresnelMaterial.getTransparency()
         );
     }
 

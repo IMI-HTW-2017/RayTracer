@@ -22,6 +22,11 @@ public class Material {
         this.refractionIndex = refractionIndex;
     }
 
+
+    public Material(Material material) {
+        this(new Color((float) material.albedo.x, (float) material.albedo.y, (float) material.albedo.z), material.roughness, material.metalness, material.reflectivity, material.transparency, material.refractionIndex);
+    }
+
     public static Material CreateMetal(Color albedo, double metalness, double reflectivity) {
         return new Material(albedo, 0.001, metalness, reflectivity, 0, 0);
     }
@@ -107,5 +112,19 @@ public class Material {
 
     public double getRefractionIndex() {
         return refractionIndex;
+    }
+
+    public void ChangeReflectivity(double factor) {
+        reflectivity *= factor;
+    }
+
+    public void ChangeTransparency(double factor) {
+        transparency *= factor;
+    }
+
+    public void ApplyFresnel(double fresnel) {
+        double factor = fresnel * 2d;
+        reflectivity = Math.min(reflectivity * factor, 1);
+        transparency = Math.min(transparency * (2 - factor), 1);
     }
 }

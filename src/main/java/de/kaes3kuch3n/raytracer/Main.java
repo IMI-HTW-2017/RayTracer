@@ -39,16 +39,14 @@ public class Main {
 //        CSG csg4 = new CSG(csg1, csg2, CSGOperator.INTERSECT);
 //        CSG csg5 = new CSG(csg3, csg4, CSGOperator.INTERSECT);
 
-        Quadric bottom = new Cylinder(0, 1, 1, 0.001, transparent).translate(0, -4, 0).scale(1, 1, 2000).rotateX(-20);
+        Quadric bottom = new Plane(0, 1, 0, 1, transparent).translate(0, -4, 0).rotateX(0);
         Quadric sphere1 = new Sphere(1, red).translate(0, -8, -3);
-        Quadric sphere2 = new Sphere(50, red).translate(0, -20, -50);
-        Quadric sphere3 = new Sphere(1, red).translate(-5, 0, -10);
-        Quadric sphere4 = new Sphere(1, red).translate(5, 3, -20);
-        Quadric sphere5 = new Sphere(50, red).translate(20, 15, -50);
-        Quadric cyl1 = new Cylinder(0, 1, 1, 0.5, white2).translate(0, 0, -1);
+        Quadric sphere2 = new Sphere(50, red).translate(0, -18, -50);
+        Quadric sphere3 = new Sphere(0.5, red).translate(-1.5, -2, 0);
+        Quadric sphere5 = new Sphere(50, red).translate(20, 6, -50);
 
 
-        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(sphere4), new CSG(sphere5));
+        scene.addCSGs(new CSG(sphere1), new CSG(sphere2), new CSG(sphere3), new CSG(bottom), new CSG(sphere5));
 
         scene.addLights(
                 new Light(new Vector3(0, 3, 5), new Color(255, 255, 255), 1f)
@@ -66,7 +64,6 @@ public class Main {
 
             JSlider slider = (JSlider) eventSource;
             double value = slider.getValue() / 5d;
-            cyl1.rotateZ(value);
 
 
             imagePanel.updateImage(scene.renderImage(window.getSize()));
