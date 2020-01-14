@@ -164,7 +164,7 @@ public class Scene {
                 double newReflectionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
                 double newRefractionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
                 reflectionColor = calculateColorRecursive(newHit, reflectionStep + 1, newReflectionWeight,
-                        refractionStep, newRefractionWeight, previousRefractionIndex).multiply(reflectionWeight * fresnel);
+                        refractionStep, newRefractionWeight, previousRefractionIndex);
             }
         }
         // REFRACTION
@@ -181,7 +181,7 @@ public class Scene {
                 double newReflectionWeight = refractionWeight * newHit.quadric.getMaterial().getReflectivity();
                 double newRefractionWeight = refractionWeight * newHit.quadric.getMaterial().getTransparency();
                 refractionColor = calculateColorRecursive(newHit, reflectionStep, newReflectionWeight,
-                        refractionStep + 1, newRefractionWeight, fresnelMaterial.getRefractionIndex()).multiply(refractionWeight * (1 - fresnel));
+                        refractionStep + 1, newRefractionWeight, fresnelMaterial.getRefractionIndex());
             }
         }
         return new Vector3(

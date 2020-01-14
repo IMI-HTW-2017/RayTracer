@@ -49,13 +49,13 @@
       },
       "material": {
         "albedo": {
-          "red": 0.2,
-          "green": 0.62,
-          "blue": 0.72
+          "red": 0,
+          "green": 0,
+          "blue": 0
         },
         "roughness": 0.001,
         "metalness": 0.3,
-        "reflectivity": 0.9,
+        "reflectivity": 0.999,
         "transparency": 0,
         "refractionIndex": 1
       }
