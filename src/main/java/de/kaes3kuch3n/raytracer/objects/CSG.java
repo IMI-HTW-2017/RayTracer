@@ -62,7 +62,7 @@ public class CSG extends Quadric {
                 break;
             case SUBTRACT:
                 //First missed? Second missed? First before second hit?
-                if (firstHits.isEmpty() || secondHits.isEmpty() || firstHits.firstKey() < secondHits.firstKey())
+                if (firstHits.isEmpty() || secondHits.isEmpty() || firstHits.size() > 1 && firstHits.firstKey() < secondHits.firstKey())
                     return firstHits;
                 //Going through the object
                 if (firstHits.lastKey() < secondHits.lastKey())

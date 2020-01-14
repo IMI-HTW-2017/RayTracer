@@ -67,8 +67,8 @@ public class Scene {
                 planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
                 //Debug
-                if (x == imageSize.width / 3 && y == imageSize.height - 10)
-                    System.out.println();
+//                if (x == imageSize.width / 2 && y == imageSize.height / 3)
+//                    System.out.println();
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 Ray.Hit hit = getClosestCSG(ray);
