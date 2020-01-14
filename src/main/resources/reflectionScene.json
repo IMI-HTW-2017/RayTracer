@@ -161,6 +161,7 @@
         "y": 0,
         "z": 5
       },
+      "radius": 1,
       "color": {
         "red": 1,
         "green": 1,

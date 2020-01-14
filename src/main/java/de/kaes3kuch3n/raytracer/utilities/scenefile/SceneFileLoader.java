@@ -41,7 +41,7 @@ public class SceneFileLoader {
         for (int i = 0; i < sceneFile.lights.length; i++) {
             SceneLight light = sceneFile.lights[i];
             Color color = new Color(light.color.red, light.color.green, light.color.blue);
-            lights[i] = new Light(light.position, color, light.intensity);
+            lights[i] = new Light(light.position, light.radius, color, light.intensity);
         }
 
         return lights;
