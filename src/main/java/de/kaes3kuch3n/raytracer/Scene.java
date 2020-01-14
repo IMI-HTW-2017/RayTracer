@@ -16,9 +16,9 @@ public class Scene {
     private Camera camera;
     private Skydome skydome;
 
-    public Scene(Camera camera) {
+    public Scene(Camera camera, Skydome skydome) {
         this.camera = camera;
-        skydome = new Skydome("src/main/resources/skydome.jpg");
+        this.skydome = skydome;
     }
 
     public void addCSGs(CSG... csgs) {

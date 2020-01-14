@@ -4,4 +4,5 @@ public class SceneFile {
     public SceneObject[] objects;
     public SceneLight[] lights;
     public SceneCamera camera;
+    public String skydomeFilePath;
 }

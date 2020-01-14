@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import de.kaes3kuch3n.raytracer.Camera;
 import de.kaes3kuch3n.raytracer.objects.*;
 import de.kaes3kuch3n.raytracer.utilities.Material;
+import de.kaes3kuch3n.raytracer.utilities.Skydome;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -51,6 +52,17 @@ public class SceneFileLoader {
             throw new SceneFileLoadingError("No camera defined in scene file");
         SceneCamera camera = sceneFile.camera;
         return new Camera(camera.position, camera.focusPoint, camera.roll);
+    }
+
+    public Skydome loadSkydome() {
+        if (sceneFile.skydomeFilePath == null || sceneFile.skydomeFilePath.isEmpty()) {
+            throw new SceneFileLoadingError("No skydome file path defined in scene file");
+        }
+        try {
+            return new Skydome(sceneFile.skydomeFilePath);
+        } catch (IOException e) {
+            throw new SceneFileLoadingError("Invalid skydome file path");
+        }
     }
 
     private CSG loadObject(SceneObject object) {

@@ -10,7 +10,7 @@ public class Main {
     private void show(String sceneFilePath) {
         SceneFileLoader sceneFileLoader = new SceneFileLoader(sceneFilePath);
 
-        scene = new Scene(sceneFileLoader.loadCamera());
+        scene = new Scene(sceneFileLoader.loadCamera(), sceneFileLoader.loadSkydome());
         scene.addCSGs(sceneFileLoader.loadCSGs());
         scene.addLights(sceneFileLoader.loadLights());
 
