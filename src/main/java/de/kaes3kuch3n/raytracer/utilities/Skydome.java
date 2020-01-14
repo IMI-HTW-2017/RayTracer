@@ -18,7 +18,7 @@ public class Skydome {
     }
 
     public Color getColor(double x, double y) {
-        int argb = texture.getRGB((int) (x * texture.getWidth()), (int) (y * texture.getHeight()));
+        int argb = texture.getRGB((int) (x * (texture.getWidth() - 1)), (int) (y * (texture.getHeight() - 1)));
         return new Color(argb);
     }
 }

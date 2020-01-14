@@ -159,7 +159,7 @@ public class Scene {
             Ray ray = new Ray(rayOrigin, newDirection);
             Ray.Hit newHit = getClosestCSG(ray);
             if (newHit == null)
-                reflectionColor = getSkydomeColor(rayDirection);
+                reflectionColor = getSkydomeColor(newDirection);
             else {
                 double newReflectionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
                 double newRefractionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
@@ -176,7 +176,7 @@ public class Scene {
             rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
             Ray.Hit newHit = getClosestCSG(new Ray(rayOrigin, refractionDirection));
             if (newHit == null)
-                refractionColor = getSkydomeColor(rayDirection);
+                refractionColor = getSkydomeColor(refractionDirection);
             else {
                 double newReflectionWeight = refractionWeight * newHit.quadric.getMaterial().getReflectivity();
                 double newRefractionWeight = refractionWeight * newHit.quadric.getMaterial().getTransparency();
