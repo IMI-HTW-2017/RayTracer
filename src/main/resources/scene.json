@@ -124,5 +124,6 @@
       "z": 4
     },
     "roll": 0
-  }
+  },
+  "skydomeFilePath": "src/main/resources/skydome.png"
 }
