@@ -2,10 +2,7 @@ package de.kaes3kuch3n.raytracer;
 
 import de.kaes3kuch3n.raytracer.objects.CSG;
 import de.kaes3kuch3n.raytracer.objects.Light;
-import de.kaes3kuch3n.raytracer.utilities.Consts;
-import de.kaes3kuch3n.raytracer.utilities.Material;
-import de.kaes3kuch3n.raytracer.utilities.Ray;
-import de.kaes3kuch3n.raytracer.utilities.Vector3;
+import de.kaes3kuch3n.raytracer.utilities.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,9 +14,11 @@ public class Scene {
     private List<CSG> csgs = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
     private Camera camera;
+    private Skydome skydome;
 
     public Scene(Camera camera) {
         this.camera = camera;
+        skydome = new Skydome("src/main/resources/skydome.jpg");
     }
 
     public void addCSGs(CSG... csgs) {
@@ -73,9 +72,11 @@ public class Scene {
 
                 Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
                 Ray.Hit hit = getClosestCSG(ray);
-                if (hit == null)
-                    continue;
-                image.setRGB(x, y, calculateColor(hit));
+                if (hit == null) {
+                    Vector3 color = getSkydomeColor(ray.getDirection());
+                    image.setRGB(x, y, new Color((int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255)).getRGB());
+                } else
+                    image.setRGB(x, y, calculateColor(hit));
             }
         }
         return image;
@@ -103,10 +104,9 @@ public class Scene {
     }
 
     private Vector3 calculateColorRecursive(Ray.Hit rayHit, int reflectionStep, double reflectionWeight, int refractionStep, double refractionWeight, double previousRefractionIndex) {
-
         // Recursion limit reached
         if (reflectionStep > Consts.Reflection.MAX_STEPS || refractionStep > Consts.Refraction.MAX_STEPS)
-            return new Vector3(new Color(0, 0, 0));
+            return getSkydomeColor(rayHit.ray.getDirection());
 
         double r = 0;
         double g = 0;
@@ -159,7 +159,7 @@ public class Scene {
             Ray ray = new Ray(rayOrigin, newDirection);
             Ray.Hit newHit = getClosestCSG(ray);
             if (newHit == null)
-                reflectionColor = new Vector3(new Color(0, 0, 0));
+                reflectionColor = getSkydomeColor(rayDirection);
             else {
                 double newReflectionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
                 double newRefractionWeight = reflectionWeight * (1 - newHit.quadric.getMaterial().getReflectivity());
@@ -176,7 +176,7 @@ public class Scene {
             rayOrigin = Vector3.add(rayHit.position, normalVector.inverted().multiply(Consts.SMALL_VALUE));
             Ray.Hit newHit = getClosestCSG(new Ray(rayOrigin, refractionDirection));
             if (newHit == null)
-                refractionColor = new Vector3(new Color(0, 0, 0));
+                refractionColor = getSkydomeColor(rayDirection);
             else {
                 double newReflectionWeight = refractionWeight * newHit.quadric.getMaterial().getReflectivity();
                 double newRefractionWeight = refractionWeight * newHit.quadric.getMaterial().getTransparency();
@@ -214,5 +214,18 @@ public class Scene {
                 return 1 - otherRayHit.quadric.getMaterial().getTransparency();
         }
         return 0;
+    }
+
+    private Vector3 getSkydomeColor(Vector3 direction) {
+        if (direction.y < 0)
+            return new Vector3(0, 0, 0);
+
+        direction = direction.normalized();
+        double x = (direction.x + 1) / 2;
+        double y = (direction.z + 1) / 2;
+
+        Color color = skydome.getColor(x, y);
+
+        return new Vector3(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0);
     }
 }
