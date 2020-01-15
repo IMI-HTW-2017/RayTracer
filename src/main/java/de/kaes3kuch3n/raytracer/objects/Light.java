@@ -39,7 +39,7 @@ public class Light {
             z /= magnitude;
         }
 
-        return new Vector3(x * radius, y * radius, z * radius);
+        return new Vector3(position.x + x * radius, position.y + y * radius, position.z + z * radius);
     }
 
     public Vector3 getColor() {

@@ -50,8 +50,8 @@
       "material": {
         "albedo": {
           "red": 1,
-          "green": 0,
-          "blue": 0
+          "green": 1,
+          "blue": 1
         },
         "roughness": 0.01,
         "metalness": 0.001,
@@ -68,7 +68,7 @@
         "y": 10,
         "z": 5
       },
-      "radius": 10,
+      "radius": 1,
       "color": {
         "red": 1,
         "green": 1,

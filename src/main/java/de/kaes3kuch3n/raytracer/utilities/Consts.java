@@ -17,6 +17,11 @@ public class Consts {
 
         public static final int MAX_STEPS = 20;
         public static final double WEIGHT_MIN = 0.01;
+    }
 
+    public static class Shadows {
+        public static final int RAY_COUNT = 500;
+        public static final double DISTANCE_WEIGHT = 5;
+        public static final double FRESNEL_WEIGHT = 1;
     }
 }

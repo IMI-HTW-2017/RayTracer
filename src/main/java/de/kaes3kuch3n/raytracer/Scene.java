@@ -126,7 +126,7 @@ public class Scene {
         for (Light light : lights) {
 
             Vector3 lightDirection = Vector3.subtract(light.getPosition(), rayHit.position).normalized();
-            double shadowFactor = getShadowFactor(new Ray(rayOrigin, lightDirection), light.getPosition());
+            double shadowFactor = getShadowFactor(rayOrigin, light);
 
             Vector3 specularComponent = quadricMaterial.getSpecularComponent(normalVector, rayDirection.inverted(), lightDirection);
             double metalness = quadricMaterial.getMetalness();
@@ -205,15 +205,27 @@ public class Scene {
         return closetHit;
     }
 
-    private double getShadowFactor(Ray rayToLight, Vector3 lightPosition) {
-        //Check if there is a csg between the current csg and the light source
-        for (CSG otherCSG : csgs) {
-            Ray.Hit otherRayHit = otherCSG.getFirstRayHit(rayToLight);
-            //Something hit?
-            if (otherRayHit != null && otherRayHit.distance < Vector3.subtract(lightPosition, rayToLight.getOrigin()).magnitude())
-                return 1 - otherRayHit.quadric.getMaterial().getTransparency();
+    private double getShadowFactor(Vector3 origin, Light light) {
+        double shadowFactor = 0;
+        double weight = 1.0 / Consts.Shadows.RAY_COUNT;
+
+        for (int i = 0; i < Consts.Shadows.RAY_COUNT; i++) {
+            Vector3 lightPosition = light.getRandomPoint();
+            Ray rayToLight = new Ray(origin, Vector3.subtract(lightPosition, origin));
+
+            for (CSG otherCSG : csgs) {
+                Ray.Hit otherRayHit = otherCSG.getFirstRayHit(rayToLight);
+                double lightDistance = Vector3.subtract(lightPosition, rayToLight.getOrigin()).magnitude();
+                //Something hit?
+                if (otherRayHit != null && otherRayHit.distance < lightDistance) {
+                    double distanceFactor = light.getIntensity() * Consts.Shadows.DISTANCE_WEIGHT / lightDistance;
+                    double fresnelFactor = Math.abs(Vector3.dot(rayToLight.getDirection().inverted(), Vector3.subtract(lightPosition, light.getPosition()))) * Consts.Shadows.FRESNEL_WEIGHT;
+                    shadowFactor += (1 - otherRayHit.quadric.getMaterial().getTransparency()) * weight * distanceFactor * fresnelFactor;
+                }
+            }
         }
-        return 0;
+
+        return Math.min(shadowFactor, 1);
     }
 
     private Vector3 getSkydomeColor(Vector3 direction) {
