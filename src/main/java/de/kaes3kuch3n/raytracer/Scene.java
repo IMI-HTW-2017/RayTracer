@@ -5,7 +5,6 @@ import de.kaes3kuch3n.raytracer.objects.Light;
 import de.kaes3kuch3n.raytracer.utilities.*;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,12 +12,18 @@ import java.util.List;
 public class Scene {
     private List<CSG> csgs = new ArrayList<>();
     private List<Light> lights = new ArrayList<>();
-    private Camera camera;
+    private Vector3 cameraPosition;
+    private Camera.ImagePlane imagePlane;
     private Skydome skydome;
 
     public Scene(Camera camera, Skydome skydome) {
-        this.camera = camera;
+        cameraPosition = camera.getPosition();
+        imagePlane = camera.getImagePlane();
         this.skydome = skydome;
+    }
+
+    public Camera.ImagePlane getImagePlane() {
+        return imagePlane;
     }
 
     public void addCSGs(CSG... csgs) {
@@ -29,57 +34,21 @@ public class Scene {
         this.lights.addAll(Arrays.asList(lights));
     }
 
-    public Image renderImage(Dimension imageSize) {
-        BufferedImage image = new BufferedImage(imageSize.width, imageSize.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = image.createGraphics();
-        graphics2D.setPaint(Color.BLACK);
-        graphics2D.fillRect(0, 0, image.getWidth(), image.getHeight());
+    public Color getPixelColor(int x, int y, double stepSizeX, double stepSizeY, Vector3 topLeft) {
+        Vector3 stepVectorX = imagePlane.rightVector.multiply(stepSizeX * x);
+        Vector3 stepVectorY = imagePlane.upVector.inverted().multiply(stepSizeY * y);
 
-        // Get image plane and use it for calculating the ray directions
-        Camera.ImagePlane plane = camera.getImagePlane();
+        double planePosX = topLeft.x + stepVectorX.x + stepVectorY.x;
+        double planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
+        double planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
 
-        // Calculate aspect ratio
-        double widthRatio;
-        double heightRatio;
-        if (imageSize.width > imageSize.height) {
-            widthRatio = 1;
-            heightRatio = (double) imageSize.height / imageSize.width;
-        } else {
-            widthRatio = (double) imageSize.width / imageSize.height;
-            heightRatio = 1;
-        }
-
-        //Starting position is the top-left corner
-        Vector3 topLeft = Vector3.subtract(plane.focusPoint, Vector3.add(plane.rightVector.multiply(widthRatio), plane.upVector.inverted().multiply(heightRatio)));
-        double stepSizeX = 2.0 * widthRatio / imageSize.width;
-        double stepSizeY = 2.0 * heightRatio / imageSize.height;
-
-        double planePosX, planePosY, planePosZ;
-
-        for (int y = 0; y < imageSize.height; y++) {
-            for (int x = 0; x < imageSize.width; x++) {
-
-                Vector3 stepVectorX = plane.rightVector.multiply(stepSizeX * x);
-                Vector3 stepVectorY = plane.upVector.inverted().multiply(stepSizeY * y);
-
-                planePosX = topLeft.x + stepVectorX.x + stepVectorY.x;
-                planePosY = topLeft.y + stepVectorX.y + stepVectorY.y;
-                planePosZ = topLeft.z + stepVectorX.z + stepVectorY.z;
-
-                //Debug
-//                if (x == imageSize.width / 2 && y == imageSize.height / 3)
-//                    System.out.println();
-
-                Ray ray = new Ray(camera.getPosition(), Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), camera.getPosition()));
-                Ray.Hit hit = getClosestCSG(ray);
-                if (hit == null) {
-                    Vector3 color = getSkydomeColor(ray.getDirection());
-                    image.setRGB(x, y, new Color((int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255)).getRGB());
-                } else
-                    image.setRGB(x, y, calculateColor(hit));
-            }
-        }
-        return image;
+        Ray ray = new Ray(cameraPosition, Vector3.subtract(new Vector3(planePosX, planePosY, planePosZ), cameraPosition));
+        Ray.Hit hit = getClosestCSG(ray);
+        if (hit == null) {
+            Vector3 color = getSkydomeColor(ray.getDirection());
+            return new Color((int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255));
+        } else
+            return calculateColor(hit);
     }
 
     /**
@@ -88,7 +57,7 @@ public class Scene {
      * @param rayHit The rayhit of the quadric and ray
      * @return The color of the pixel (RGB int)
      */
-    private int calculateColor(Ray.Hit rayHit) {
+    private Color calculateColor(Ray.Hit rayHit) {
         Material mat = rayHit.quadric.getMaterial();
         Vector3 color = calculateColorRecursive(rayHit, 1, mat.getReflectivity(), 1, mat.getTransparency(), Consts.Refraction.AIR);
 
@@ -100,7 +69,7 @@ public class Scene {
         g = Math.max(0, Math.min(g, 255));
         b = Math.max(0, Math.min(b, 255));
 
-        return new Color(r, g, b).getRGB();
+        return new Color(r, g, b);
     }
 
     private Vector3 calculateColorRecursive(Ray.Hit rayHit, int reflectionStep, double reflectionWeight, int refractionStep, double refractionWeight, double previousRefractionIndex) {

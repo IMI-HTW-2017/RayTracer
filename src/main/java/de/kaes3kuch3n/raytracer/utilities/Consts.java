@@ -20,7 +20,7 @@ public class Consts {
     }
 
     public static class Shadows {
-        public static final int RAY_COUNT = 500;
+        public static final int RAY_COUNT = 50;
         public static final double DISTANCE_WEIGHT = 5;
         public static final double FRESNEL_WEIGHT = 1;
     }

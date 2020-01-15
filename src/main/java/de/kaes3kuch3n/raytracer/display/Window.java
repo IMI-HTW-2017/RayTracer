@@ -16,16 +16,15 @@ public class Window {
     /**
      * Create a new window instance with a fixed inner width and height
      *
-     * @param width  The width of the window's content pane
-     * @param height The height of the window's content pane
+     * @param dimension The size of the window's content pane
      */
-    public Window(int width, int height) {
+    public Window(Dimension dimension) {
         sliderPanel = new JPanel();
         sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.PAGE_AXIS));
 
         window = new JFrame("Ray Tracer");
-        window.setSize(width, height);
-        window.getContentPane().setSize(width, height);
+        window.setSize(dimension);
+        window.getContentPane().setSize(dimension);
         window.add(sliderPanel, BorderLayout.SOUTH);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

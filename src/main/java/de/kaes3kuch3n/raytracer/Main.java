@@ -4,20 +4,25 @@ import de.kaes3kuch3n.raytracer.display.ImagePanel;
 import de.kaes3kuch3n.raytracer.display.Window;
 import de.kaes3kuch3n.raytracer.utilities.scenefile.SceneFileLoader;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 public class Main {
-    private Scene scene;
 
     private void show(String sceneFilePath) {
         SceneFileLoader sceneFileLoader = new SceneFileLoader(sceneFilePath);
 
-        scene = new Scene(sceneFileLoader.loadCamera(), sceneFileLoader.loadSkydome());
+        Scene scene = new Scene(sceneFileLoader.loadCamera(), sceneFileLoader.loadSkydome());
         scene.addCSGs(sceneFileLoader.loadCSGs());
         scene.addLights(sceneFileLoader.loadLights());
 
-        Window window = new Window(800, 800);
-        ImagePanel imagePanel = new ImagePanel(scene.renderImage(window.getSize()));
+        Dimension windowSize = new Dimension(800, 800);
+        Window window = new Window(windowSize);
+        Renderer sceneRenderer = new Renderer(scene);
+        ImagePanel imagePanel = new ImagePanel(new BufferedImage(windowSize.width, windowSize.height, BufferedImage.TYPE_INT_ARGB));
         window.setImage(imagePanel);
-        window.addResizeListener(size -> imagePanel.updateImage(scene.renderImage(size)));
+        sceneRenderer.renderImage(windowSize, imagePanel);
+        window.addResizeListener(size -> sceneRenderer.renderImage(size, imagePanel));
     }
 
     public static void main(String[] args) {
